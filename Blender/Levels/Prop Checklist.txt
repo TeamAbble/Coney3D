@@ -3,19 +3,19 @@
 🟠 = Incomplete
 🔴 = Not Started
 
-Excavator 🟡
-Cement Truck 🟡
+Excavator 🟢
+Cement Truck 🟢
 Forklift 🔴
-Metal Beam 🟡
-Cement Bag 🟡
+Metal Beam 🟢
+Cement Bag 🟢
 Cement Mixer 🔴
-Barrel 🟡
-Steel Coil 🟡
-Wooden Pallet 🟡
+Barrel 🟢
+Steel Coil 🟢
+Wooden Pallet 🟢
 Wheelbarrow 🔴
-Ladder 🟡
+Ladder 🟢
 Barricade 🔴
-Crain 🔴
+Crane 🔴
 Scaffolding 🔴
 Brick Wall🔴
 Bucket 🔴
