@@ -4,7 +4,7 @@
 🔴 = Not Started
 
 Excavator 🟡
-Cement Truck 🟠
+Cement Truck 🟡
 Forklift 🔴
 Metal Beam 🟡
 Cement Bag 🟡
