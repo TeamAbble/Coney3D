@@ -5,10 +5,10 @@
 
 Excavator 🟢
 Cement Truck 🟢
-Forklift 🔴
+Forklift 🟢	
 Metal Beam 🟢
 Cement Bag 🟢
-Cement Mixer 🔴
+Cement Mixer 🟠
 Barrel 🟢
 Steel Coil 🟢
 Wooden Pallet 🟢
@@ -20,4 +20,4 @@ Scaffolding 🔴
 Brick Wall🔴
 Bucket 🔴
 Architecture Building 🔴
-Portable Toilets 🟠
+Portable Toilets 🟢
