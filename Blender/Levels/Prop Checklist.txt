@@ -8,13 +8,13 @@ Cement Truck 🟢
 Forklift 🟢	
 Metal Beam 🟢
 Cement Bag 🟢
-Cement Mixer 🟠
+Cement Mixer 🟢
 Barrel 🟢
 Steel Coil 🟢
 Wooden Pallet 🟢
-Wheelbarrow 🔴
+Wheelbarrow 🟢
 Ladder 🟢
-Barricade 🔴
+Barricade 🟢
 Crane 🔴
 Scaffolding 🔴
 Brick Wall🔴
