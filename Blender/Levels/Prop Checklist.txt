@@ -1,0 +1,23 @@
+🟢 = Complete
+🟡 = Complete No Texture
+🟠 = Incomplete
+🔴 = Not Started
+
+Excavator 🟡
+Cement Truck 🟡
+Forklift 🔴
+Metal Beam 🟡
+Cement Bag 🟡
+Cement Mixer 🔴
+Barrel 🟡
+Steel Coil 🟡
+Wooden Pallet 🟡
+Wheelbarrow 🔴
+Ladder 🟡
+Barricade 🔴
+Crain 🔴
+Scaffolding 🔴
+Brick Wall🔴
+Bucket 🔴
+Architecture Building 🔴
+Portable Toilets 🔴
