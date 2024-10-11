@@ -43,7 +43,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Jumping);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APlayerCharacter::Dash);
 
 	}
 
@@ -51,14 +53,13 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::Move(const FInputActionValue& value)
 {
-	FVector2D MovementVector = value.Get<FVector2D>();
+	MovementVector = value.Get<FVector2D>();
 
 	if (Controller != nullptr) {
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		Rotation = Controller->GetControlRotation();
+		YawRotation = FRotator(0, Rotation.Yaw, 0);
 
-		const FVector ForwardDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		const FVector RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		UpdateDirection();
 
 		AddMovementInput(ForwardDir, MovementVector.Y);
 		AddMovementInput(RightDir, MovementVector.X);
@@ -80,4 +81,35 @@ void APlayerCharacter::Jumping()
 {
 	Jump();
 }
+
+void APlayerCharacter::UpdateDirection()
+{
+	ForwardDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+}
+
+void APlayerCharacter::Dash()
+{
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.Y));
+
+	}
+	FVector Up = FVector(0, 0, DashUpwardVelocity);
+	if (MovementVector != FVector2D(0, 0)) {
+		LaunchCharacter(FVector(ForwardDir * MovementVector.Y + RightDir * MovementVector.X) * DashSpeed + Up, true, true);
+	}
+	else {
+		UpdateDirection();
+		LaunchCharacter(ForwardDir * DashSpeed + Up, true, true);
+	}
+	
+}
+
+
+FVector2D APlayerCharacter::GetMovementVector()
+{
+	return FVector2D(MovementVector);
+}
+
 

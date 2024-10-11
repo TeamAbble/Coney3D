@@ -19,6 +19,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	FVector ForwardDir;
+	FVector RightDir;
+	FVector2D MovementVector;
+	FRotator Rotation;
+	FRotator YawRotation;
 
 public:	
 	// Called every frame
@@ -30,8 +35,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* JumpAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* LookAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* SprintAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* DashAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashUpwardVelocity;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float SprintSpeed;
+	
+
+	float currentTime;
 	
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
 	void Jumping();
+	void UpdateDirection();
+	void Dash();
+	FVector2D GetMovementVector();
 };
