@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "BaseWeapon.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABaseWeapon::ABaseWeapon()
@@ -16,6 +16,10 @@ void ABaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	timeBetweenShots = 1 / (shotsPerMinute / 60);
+	connectedPlayer = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	canFire = true;
+	currentAmmo = maxAmmo;
+
 }
 
 void ABaseWeapon::TryFire()
@@ -29,15 +33,26 @@ void ABaseWeapon::TryFire()
 void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	canFire = !fireBlocked;
 	bool firePressed = false;
+	if (!connectedPlayer) {
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "ERROR! NO PLAYER CHARACTER OWNS WEAPON: " + GetName());
+
+		}
+	}
+	else {
+		fireInput = connectedPlayer->GetFireInput();
+	}
+	
 
 	if (canFire) {
 		if (chargeTime > 0) {
 			currentCharge = FMath::Clamp(currentCharge + (fireInput ? DeltaTime : -chargeDecay), 0, chargeTime);
 		}
 
-		if (fireInput && (chargeTime == 0 || currentCharge >= chargeTime) && (firePressed || fireMode != FireType::single)) {
+		if (fireInput && (chargeTime == 0 || currentCharge >= chargeTime) && (firePressed || fireMode != single)) {
 			TryFire();
 			firePressed = true;
 		}

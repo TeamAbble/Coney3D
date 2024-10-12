@@ -37,17 +37,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* SprintAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* DashAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* FireAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashUpwardVelocity;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float SprintSpeed;
 	
 
 	float currentTime;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") bool fireInput;
 	
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
+	void SetFire(const FInputActionValue& value);
 	void Jumping();
 	void UpdateDirection();
 	void Dash();
+	bool GetFireInput();
 	FVector2D GetMovementVector();
 };

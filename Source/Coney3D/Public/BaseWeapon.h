@@ -15,10 +15,19 @@ class CONEY3D_API ABaseWeapon : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeapon();
+	enum EFireType
+	{
+		none = 0,
+		single = 1,
+		rapidfire = 2,
+	};
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+public:	
+
 	void TryFire();
 	/// <summary>
 	/// Is this weapon currently able to fire?
@@ -35,7 +44,7 @@ protected:
 	/// <summary>
 	/// How much ammo we have when full. If zero, we won't use ammo
 	/// </summary>
-	int32 maxAmmo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Ammunition") int32 maxAmmo;
 	/// <summary>
 	/// How many times a minute does this weapon fire?
 	/// </summary>
@@ -56,16 +65,11 @@ protected:
 	float currentCharge;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxAccumulatedSpreadAngle;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float max;
-	enum FireType
-	{
-		none = 0,
-		single = 1,
-		rapidfire = 2,
-	};
-	FireType fireMode;
-public:	
+	EFireType fireMode;
+
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	bool fireInput;
-	APlayerCharacter connectedPlayer;
+	APlayerCharacter* connectedPlayer;
 };
