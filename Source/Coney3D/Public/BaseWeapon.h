@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "EFireType.h"
 #include "PlayerCharacter.h"
 #include "BaseWeapon.generated.h"
 
@@ -11,7 +14,7 @@ UCLASS()
 class CONEY3D_API ABaseWeapon : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeapon();
@@ -19,11 +22,21 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	FTimerHandle resetFireTimerHandle;
+
+public:	
+
 	void TryFire();
+	void ResetFired();
 	/// <summary>
 	/// Is this weapon currently able to fire?
 	/// </summary>
 	bool canFire;
+	/// <summary>
+	/// Has the weapon been fired?
+	/// </summary>
+	bool fired;
 	/// <summary>
 	/// Is firing this weapon currently blocked?
 	/// </summary>
@@ -35,7 +48,7 @@ protected:
 	/// <summary>
 	/// How much ammo we have when full. If zero, we won't use ammo
 	/// </summary>
-	int32 maxAmmo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Ammunition") int32 maxAmmo;
 	/// <summary>
 	/// How many times a minute does this weapon fire?
 	/// </summary>
@@ -53,19 +66,19 @@ protected:
 	/// </summary>
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float chargeDecay;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") bool fullChargeOnFire;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") TEnumAsByte<EFireType> fireMode;
 	float currentCharge;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxAccumulatedSpreadAngle;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float max;
-	enum FireType
-	{
-		none = 0,
-		single = 1,
-		rapidfire = 2,
-	};
-	FireType fireMode;
-public:	
+
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	bool fireInput;
-	APlayerCharacter connectedPlayer;
+	UPROPERTY(EditAnywhere, Category = "Weapon - References") APlayerCharacter* connectedPlayer;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,  Category = "Weapon - References") USceneComponent* muzzlePoint;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - References") FVector muzzlePointPosition;
+	UPROPERTY(EditAnywhere, Category = "Weapon - Visuals") UNiagaraSystem* muzzleFlashSystem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") UNiagaraComponent* muzzleFlashInstance;
+
 };

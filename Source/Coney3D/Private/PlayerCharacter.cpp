@@ -46,11 +46,15 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APlayerCharacter::Dash);
-
+		//Registers the fire callback for both started and completed
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SetFire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &APlayerCharacter::SetFire);
 	}
 
 }
-
+void APlayerCharacter::SetFire(const FInputActionValue& value) {
+	fireInput = value.Get<bool>();
+}
 void APlayerCharacter::Move(const FInputActionValue& value)
 {
 	MovementVector = value.Get<FVector2D>();
@@ -104,6 +108,11 @@ void APlayerCharacter::Dash()
 		LaunchCharacter(ForwardDir * DashSpeed + Up, true, true);
 	}
 	
+}
+
+bool APlayerCharacter::GetFireInput()
+{
+	return fireInput;
 }
 
 
