@@ -71,5 +71,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	bool fireInput;
-	APlayerCharacter* connectedPlayer;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - References") APlayerCharacter* connectedPlayer;
 };
