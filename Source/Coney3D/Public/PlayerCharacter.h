@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -40,6 +41,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* FireAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashUpwardVelocity;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float WalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float SprintSpeed;
 	
 
@@ -50,6 +52,7 @@ public:
 	void Look(const FInputActionValue& value);
 	void SetFire(const FInputActionValue& value);
 	void Jumping();
+	void Sprint();
 	void UpdateDirection();
 	void Dash();
 	bool GetFireInput();

@@ -18,6 +18,6 @@ Barricade 🟢
 Crane 🔴
 Scaffolding 🔴
 Brick Wall🔴
-Bucket 🔴
+Bucket 🟢
 Architecture Building 🔴
 Portable Toilets 🟢
