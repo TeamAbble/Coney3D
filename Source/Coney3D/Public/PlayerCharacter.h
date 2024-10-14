@@ -5,8 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerCharacter.generated.h"
+
+class ABaseWeapon;
+
 
 UCLASS()
 class CONEY3D_API APlayerCharacter : public ACharacter
@@ -39,14 +43,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* SprintAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* DashAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* FireAction;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float DashUpwardVelocity;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float WalkSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Speed") float SprintSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashUpwardVelocity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float WalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float SprintSpeed;
 	
 
 	float currentTime;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") bool fireInput;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") USceneComponent* weaponPointRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") USceneComponent* aimRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup") UCameraComponent* playerCam;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") TSubclassOf<class ABaseWeapon> weaponBlueprint;
 	
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);

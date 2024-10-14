@@ -5,7 +5,7 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "BaseWeapon.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -20,12 +20,21 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (weaponBlueprint) {
+
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		spawnParams.Instigator = GetInstigator();
+
+		ABaseWeapon* weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprint, spawnParams);
+		weapon->AttachToComponent(weaponPointRef, FAttachmentTransformRules::KeepRelativeTransform);
+		weapon->SetActorRelativeTransform(FTransform());
+	}
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
 }
 
 // Called every frame
@@ -80,6 +89,9 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 	if (Controller != nullptr) {
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+	if (aimRef) {
+		aimRef->SetWorldRotation(GetControlRotation());
 	}
 }
 
