@@ -38,38 +38,40 @@ void ABaseWeapon::TryFire()
 	GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots,false);
 
 	//lets shoot shit
+	for (size_t i = 0; i < static_cast<int16>(fireIterations + 1); i++)
+	{
+		//We need an FHitResult, like a raycast hit
+		FHitResult hit;
+		//Then set the start and end points
+		FVector traceStart = connectedPlayer->playerCam->GetComponentLocation();
+		FVector traceEnd = connectedPlayer->playerCam->GetComponentLocation() + (FMath::VRandCone(connectedPlayer->playerCam->GetForwardVector(), 
+			FMath::DegreesToRadians(accumulatedSpeadCurrent + hipFireSpreadAngle))) * maxRange;
 
-	//We need an FHitResult, like a raycast hit
-	FHitResult hit;
-	//Then set the start and end points
-	FVector traceStart = connectedPlayer->playerCam->GetComponentLocation();
-	FVector traceEnd = connectedPlayer->playerCam->GetComponentLocation() + (FMath::VRandCone(connectedPlayer->playerCam->GetForwardVector(), 
-		FMath::DegreesToRadians((maxAccumulatedSpreadAngle * accumulatedSpeadCurrent) + hipFireSpreadAngle))) * maxRange;
+		//Then create query parameters, so we can ignore the player and the weapon
+		FCollisionQueryParams queryParams;
+		queryParams.AddIgnoredActor(this);
+		queryParams.AddIgnoredActor(connectedPlayer);
 
-	//Then create query parameters, so we can ignore the player and the weapon
-	FCollisionQueryParams queryParams;
-	queryParams.AddIgnoredActor(this);
-	queryParams.AddIgnoredActor(connectedPlayer);
+		//Then we run the line trace
+		GetWorld()->LineTraceSingleByChannel(hit, traceStart, traceEnd, traceChannelProperty, queryParams);
+		//Draw a debug line for it
+		//DrawDebugLine(GetWorld(), traceStart, traceEnd, hit.bBlockingHit ? FColor::Green : FColor::Red, false, .5f, 0, 2);
 
-	//Then we run the line trace
-	GetWorld()->LineTraceSingleByChannel(hit, traceStart, traceEnd, traceChannelProperty, queryParams);
-	//Draw a debug line for it
-	//DrawDebugLine(GetWorld(), traceStart, traceEnd, hit.bBlockingHit ? FColor::Green : FColor::Red, false, .5f, 0, 2);
-
-	if (hit.bBlockingHit && IsValid(hit.GetActor())) {
-		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Hit actor: " + hit.GetActor()->GetName());
+		if (hit.bBlockingHit && IsValid(hit.GetActor())) {
+			if (GEngine) {
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Hit actor: " + hit.GetActor()->GetName());
+			}
+			UE_LOG(LogTemp, Display, TEXT("actor hit: %s"), *hit.GetActor()->GetName());
 		}
-		UE_LOG(LogTemp, Display, TEXT("actor hit: %s"), *hit.GetActor()->GetName());
-	}
-	else {
-		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Did not hit actor");
+		else {
+			if (GEngine) {
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Did not hit actor");
+			}
+			UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
 		}
-		UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
+		accumulatedSpeadCurrent += accumulatedSpeadPerShot;
+		CreateTracer(muzzlePoint->GetComponentLocation(), traceEnd);
 	}
-	accumulatedSpeadCurrent += accumulatedSpeadPerShot;
-	CreateTracer(muzzlePoint->GetComponentLocation(), traceEnd);
 
 }
 std::vector<int> removals;
@@ -96,10 +98,10 @@ void ABaseWeapon::UpdateTracers(float DeltaTime) {
 		RaycastTracer t = tracers[i];
 		t.life += t.lerpIncrement * DeltaTime;
 		if (t.tracerActor) {
-			t.tracerActor->SetActorLocation(FMath::Lerp<FVector, float>(t.start, t.end, t.life));
+			t.tracerActor->SetActorLocation(FMath::Lerp<FVector, float>(t.start, t.end, FMath::Clamp(t.life, 0, 1)));
 			UE_LOG(LogTemp, Display, TEXT("repositioned tracer"));
 		}
-		if (t.life >= 1) {
+		if (t.life >= 1 + tracerDeleteTime) {
 			removals.push_back(i);
 		}
 		tracers.at(i) = t;

@@ -86,6 +86,7 @@ public:
 	/// How quickly the charge dissipates when not trying to fire
 	/// </summary>
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float chargeDecay = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation", meta = (Tooltip = "How many times the weapon fires, - 1. The maximum number of iterations per shot is 256.")) uint8 fireIterations = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") bool fullChargeOnFire = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") TEnumAsByte<EFireType> fireMode = EFireType::rapidfire;
 	float currentCharge;
@@ -110,6 +111,8 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") TSubclassOf<class AActor> projectileBlueprint;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float tracerSpeed = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerSpeed = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerDeleteTime = 2.f;
+
 	std::vector<RaycastTracer> tracers;
 };
