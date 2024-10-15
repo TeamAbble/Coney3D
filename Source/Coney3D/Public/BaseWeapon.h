@@ -69,8 +69,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") TEnumAsByte<EFireType> fireMode;
 	float currentCharge;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxAccumulatedSpreadAngle;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float max;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpeadPerShot;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpeadCurrent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpreadDecay;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float hipFireSpreadAngle;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxRange;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -81,4 +84,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Weapon - Visuals") UNiagaraSystem* muzzleFlashSystem;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") UNiagaraComponent* muzzleFlashInstance;
 
+	UPROPERTY(EditAnywhere, Category = "Collision")
+	TEnumAsByte<ECollisionChannel> traceChannelProperty = ECC_Pawn;
 };

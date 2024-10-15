@@ -36,6 +36,39 @@ void ABaseWeapon::TryFire()
 	}
 	fired = true;
 	GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots,false);
+
+	//lets shoot shit
+
+	//We need an FHitResult, like a raycast hit
+	FHitResult hit;
+	//Then set the start and end points
+	FVector traceStart = connectedPlayer->playerCam->GetComponentLocation();
+	FVector traceEnd = connectedPlayer->playerCam->GetComponentLocation() + (FMath::VRandCone(connectedPlayer->playerCam->GetForwardVector(), 
+		FMath::DegreesToRadians((maxAccumulatedSpreadAngle * accumulatedSpeadCurrent) + hipFireSpreadAngle))) * maxRange;
+
+	//Then create query parameters, so we can ignore the player and the weapon
+	FCollisionQueryParams queryParams;
+	queryParams.AddIgnoredActor(this);
+	queryParams.AddIgnoredActor(connectedPlayer);
+
+	//Then we run the line trace
+	GetWorld()->LineTraceSingleByChannel(hit, traceStart, traceEnd, traceChannelProperty, queryParams);
+	//Draw a debug line for it
+	DrawDebugLine(GetWorld(), traceStart, traceEnd, hit.bBlockingHit ? FColor::Green : FColor::Red, false, .5f, 0, 2);
+
+	if (hit.bBlockingHit && IsValid(hit.GetActor())) {
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Hit actor: " + hit.GetActor()->GetName());
+		}
+		UE_LOG(LogTemp, Display, TEXT("actor hit: %s"), *hit.GetActor()->GetName());
+	}
+	else {
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Did not hit actor");
+		}
+		UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
+	}
+	accumulatedSpeadCurrent += accumulatedSpeadPerShot;
 }
 
 void ABaseWeapon::ResetFired()
@@ -84,5 +117,13 @@ void ABaseWeapon::Tick(float DeltaTime)
 	else {
 		currentCharge = FMath::Min(currentCharge - chargeDecay, 0);
 	}
+
+	//if(accumulatedSpeadCurrent > 0)
+	//	accumulatedSpeadCurrent -= DeltaTime * accumulatedSpreadDecay;
+	//else if (accumulatedSpeadCurrent < 0) {
+	//	accumulatedSpeadCurrent = 0;
+	//}
+
+	accumulatedSpeadCurrent = FMath::Clamp(accumulatedSpeadCurrent - DeltaTime * accumulatedSpreadDecay, 0, maxAccumulatedSpreadAngle);
 }
 

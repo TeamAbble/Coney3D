@@ -5,7 +5,7 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "BaseWeapon.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -20,12 +20,21 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (weaponBlueprint) {
+
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		spawnParams.Instigator = GetInstigator();
+
+		ABaseWeapon* weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprint, spawnParams);
+		weapon->AttachToComponent(weaponPointRef, FAttachmentTransformRules::KeepRelativeTransform);
+		weapon->SetActorRelativeTransform(FTransform());
+	}
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
 }
 
 // Called every frame
@@ -81,6 +90,9 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+	if (aimRef) {
+		aimRef->SetWorldRotation(GetControlRotation());
+	}
 }
 
 void APlayerCharacter::Jumping()
@@ -133,6 +145,51 @@ bool APlayerCharacter::GetFireInput()
 FVector2D APlayerCharacter::GetMovementVector()
 {
 	return FVector2D(MovementVector);
+}
+
+void APlayerCharacter::Vault()
+{
+	FHitResult Hit;
+	FVector StartPos{ GetActorLocation() };
+	FVector EndPos{ StartPos + GetActorForwardVector() * 80 };
+	FCollisionObjectQueryParams ObjectsToCheck;
+	ObjectsToCheck.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+	FCollisionQueryParams ObjectsToIgnore;
+	ObjectsToIgnore.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByObjectType(Hit, StartPos, EndPos, ObjectsToCheck, ObjectsToIgnore);
+	DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Red, true);
+
+	if (Hit.Component == nullptr) {
+		bShouldClimb = false;
+		return;
+	}
+
+	FVector FrontHitLocation = Hit.Location;
+
+	FVector WallPos{ Hit.Location };
+	FVector WallNormal{ Hit.Normal };
+	FRotator WallNormalRotationX = UKismetMathLibrary::MakeRotFromX(WallNormal);
+	FVector WallNormalForwardVector = UKismetMathLibrary::GetForwardVector(WallNormalRotationX);
+	StartPos = (WallNormalForwardVector * -5) + WallPos + FVector{ 0, 0, 200 };
+	EndPos = StartPos - FVector{ 0, 0, 200 };
+	GetWorld()->LineTraceSingleByObjectType(Hit, StartPos, EndPos, ObjectsToCheck, ObjectsToIgnore);
+	DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, true);
+	FVector TopHitPos{ Hit.Location };
+	float WallHeight{ 0 };
+	if (Hit.Component != nullptr) {
+		WallHeight = TopHitPos.Z - FrontHitLocation.Z;
+	}
+	StartPos = (WallNormalForwardVector * -50) + WallPos + FVector{ 0,0,200 };
+	EndPos = StartPos - FVector{ 0,0,200 };
+	GetWorld()->LineTraceSingleByObjectType(Hit, StartPos, EndPos, ObjectsToCheck, ObjectsToIgnore);
+	DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Blue, true);
+
+	if (Hit.Component != nullptr) {
+		VaultPos = EndPos;
+	}
+	else {
+		VaultPos = { 0,0,0 };
+	}
 }
 
 
