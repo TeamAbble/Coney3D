@@ -15,9 +15,7 @@ Wooden Pallet 🟢
 Wheelbarrow 🟢
 Ladder 🟢
 Barricade 🟢
-Crane 🔴
-Scaffolding 🔴
-Brick Wall🔴
+Crane 🟢
+Scaffolding 🟢
 Bucket 🟢
-Architecture Building 🔴
 Portable Toilets 🟢
