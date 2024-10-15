@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "PlayerCharacter.generated.h"
 
 class ABaseWeapon;
@@ -56,6 +57,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup") UCameraComponent* playerCam;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") TSubclassOf<class ABaseWeapon> weaponBlueprint;
 	
+	bool bShouldClimb;
+	FVector VaultPos;
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
 	void SetFire(const FInputActionValue& value);
@@ -65,4 +68,5 @@ public:
 	void Dash();
 	bool GetFireInput();
 	FVector2D GetMovementVector();
+	void Vault();
 };
