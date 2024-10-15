@@ -8,6 +8,7 @@
 #include "NiagaraComponent.h"
 #include "EFireType.h"
 #include "PlayerCharacter.h"
+#include <vector>
 #include "BaseWeapon.generated.h"
 
 UCLASS()
@@ -18,6 +19,13 @@ class CONEY3D_API ABaseWeapon : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeapon();
+	
+	struct RaycastTracer {
+		AActor* tracerActor = nullptr;
+		FVector start = FVector(), end = FVector();
+		float lerpIncrement = 0, life = 0;
+	};
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,54 +34,67 @@ protected:
 	FTimerHandle resetFireTimerHandle;
 
 public:	
-
+	/// <summary>
+	/// performs a line trace with some mildly annoying maths to shoot a target
+	/// </summary>
 	void TryFire();
+	/// <summary>
+	/// Updates the position and lifetime of tracers, and deletes the expired ones
+	/// </summary>
+	/// <param name="DeltaTime"></param>
+	void UpdateTracers(float DeltaTime);
+	/// <summary>
+	/// Uses information from the linetrace performed by TryFire() to spawn and set up a tracer.
+	/// </summary>
+	/// <param name="traceStart"></param>
+	/// <param name="traceEnd"></param>
+	void CreateTracer(FVector traceStart, FVector traceEnd);
 	void ResetFired();
 	/// <summary>
 	/// Is this weapon currently able to fire?
 	/// </summary>
-	bool canFire;
+	bool canFire = true;
 	/// <summary>
 	/// Has the weapon been fired?
 	/// </summary>
-	bool fired;
+	bool fired = false;
 	/// <summary>
 	/// Is firing this weapon currently blocked?
 	/// </summary>
-	bool fireBlocked;
+	bool fireBlocked = false;
 	/// <summary>
 	/// How much ammunition we currently have
 	/// </summary>
-	int32 currentAmmo;
+	int32 currentAmmo = 0;
 	/// <summary>
 	/// How much ammo we have when full. If zero, we won't use ammo
 	/// </summary>
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Ammunition") int32 maxAmmo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Ammunition") int32 maxAmmo = 0;
 	/// <summary>
 	/// How many times a minute does this weapon fire?
 	/// </summary>
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float shotsPerMinute;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float shotsPerMinute = 600;
 	/// <summary>
 	/// The time, in seconds, between shots
 	/// </summary>
-	float timeBetweenShots;
+	float timeBetweenShots = 0;
 	/// <summary>
 	/// How long the weapon must be charged for to fire
 	/// </summary>
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float chargeTime;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float chargeTime = 0;
 	/// <summary>
 	/// How quickly the charge dissipates when not trying to fire
 	/// </summary>
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float chargeDecay;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") bool fullChargeOnFire;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") TEnumAsByte<EFireType> fireMode;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") float chargeDecay = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") bool fullChargeOnFire = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Operation") TEnumAsByte<EFireType> fireMode = EFireType::rapidfire;
 	float currentCharge;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxAccumulatedSpreadAngle;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpeadPerShot;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpeadCurrent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpreadDecay;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float hipFireSpreadAngle;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxRange;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxAccumulatedSpreadAngle = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpeadPerShot = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpeadCurrent = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpreadDecay = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float hipFireSpreadAngle = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxRange = 10000.f;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -86,4 +107,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	TEnumAsByte<ECollisionChannel> traceChannelProperty = ECC_Pawn;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") TSubclassOf<class AActor> projectileBlueprint;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float tracerSpeed = 500.f;
+	std::vector<RaycastTracer> tracers;
 };
