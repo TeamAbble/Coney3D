@@ -20,7 +20,6 @@ void ABaseWeapon::BeginPlay()
 		//Lol
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Set Time Between rounds on " + GetName() + " to " + FString::SanitizeFloat(timeBetweenShots));
 	}
-	connectedPlayer = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	canFire = true;
 	currentAmmo = maxAmmo;
 }
@@ -70,59 +69,24 @@ void ABaseWeapon::TryFire()
 			UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
 		}
 		accumulatedSpeadCurrent += accumulatedSpeadPerShot;
-		CreateTracer(muzzlePoint->GetComponentLocation(), traceEnd);
-	}
-
-}
-std::vector<int> removals;
-void ABaseWeapon::UpdateTracers(float DeltaTime) {
-	//If we have no tracers, we return early so we don't do anything here
-	if (removals.size() > 0) {
-		UWorld* world = GetWorld();
-		for (size_t i = 0; i < removals.size(); i++)
-		{
-			if (tracers[removals[i]].tracerActor) {
-				UE_LOG(LogTemp, Display, TEXT("despawned expired tracer"));
-				world->DestroyActor(tracers[removals[i]].tracerActor);
-			}
-			tracers.erase(tracers.begin() + removals[i]);
-		}
-		removals.clear();
-	}
-	if (tracers.size() == 0)
-		return;
-	UE_LOG(LogTemp, Display, TEXT("evaluating tracers"));
-	const int tracerSize = tracers.size();
-	for (int i = tracerSize - 1; i >= 0; i--)
-	{
-		RaycastTracer t = tracers[i];
-		t.life += t.lerpIncrement * DeltaTime;
-		if (t.tracerActor) {
-			t.tracerActor->SetActorLocation(FMath::Lerp<FVector, float>(t.start, t.end, FMath::Clamp(t.life, 0, 1)));
-			UE_LOG(LogTemp, Display, TEXT("repositioned tracer"));
-		}
-		if (t.life >= 1 + tracerDeleteTime) {
-			removals.push_back(i);
-		}
-		tracers.at(i) = t;
+		CreateTracer(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
 	}
 
 }
 void ABaseWeapon::CreateTracer(FVector traceStart, FVector traceEnd)
 {
-	RaycastTracer rt = RaycastTracer{};
-	rt.start = traceStart;
-	rt.end = traceEnd;
 	FActorSpawnParameters parameters = FActorSpawnParameters();
-	UE_LOG(LogTemp, Display, TEXT("created actor spawn parameters"));
 	parameters.Owner = this;
 	parameters.Instigator = GetInstigator();
 	FTransform transform = FTransform();
-	transform.SetLocation(muzzlePoint->GetComponentLocation());
+	transform.SetLocation(traceStart);
 	transform.SetRotation(FQuat());
-	rt.tracerActor = GetWorld()->SpawnActor<AActor>(projectileBlueprint, transform, parameters);
-	rt.lerpIncrement = tracerSpeed / FVector::Distance(traceStart, traceEnd);
-	tracers.push_back(rt);
+	AHitscanTracer* ht = GetWorld()->SpawnActor<AHitscanTracer>(projectileBlueprint, transform, parameters);
+	ht->start = traceStart;
+	ht->end = traceEnd;
+	ht->additionalLifetime = tracerDeleteTime;
+	ht->distanceIncrement = tracerSpeed / FVector::Distance(traceStart, traceEnd);
+	UE_LOG(LogTemp, Display, TEXT("created actor spawn parameters"));
 	UE_LOG(LogTemp, Display, TEXT("added tracer to vector"));
 }
 
@@ -136,7 +100,6 @@ void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//Now we can process the tracers
-	UpdateTracers(DeltaTime);
 	canFire = !fireBlocked;
 	bool firePressed = false;
 	if (!connectedPlayer) {
@@ -150,7 +113,8 @@ void ABaseWeapon::Tick(float DeltaTime)
 		}
 	}
 	else {
-		fireInput = connectedPlayer->GetFireInput();
+		if(connectedPlayer)
+			fireInput = connectedPlayer->GetFireInput();
 	}
 	
 

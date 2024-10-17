@@ -8,7 +8,7 @@
 #include "NiagaraComponent.h"
 #include "EFireType.h"
 #include "PlayerCharacter.h"
-#include <vector>
+#include "HitscanTracer.h"
 #include "BaseWeapon.generated.h"
 
 UCLASS()
@@ -38,11 +38,6 @@ public:
 	/// performs a line trace with some mildly annoying maths to shoot a target
 	/// </summary>
 	void TryFire();
-	/// <summary>
-	/// Updates the position and lifetime of tracers, and deletes the expired ones
-	/// </summary>
-	/// <param name="DeltaTime"></param>
-	void UpdateTracers(float DeltaTime);
 	/// <summary>
 	/// Uses information from the linetrace performed by TryFire() to spawn and set up a tracer.
 	/// </summary>
@@ -110,9 +105,7 @@ public:
 	TEnumAsByte<ECollisionChannel> traceChannelProperty = ECC_Pawn;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") TSubclassOf<class AActor> projectileBlueprint;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") TSubclassOf<class AHitscanTracer> projectileBlueprint;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerSpeed = 500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerDeleteTime = 2.f;
-
-	std::vector<RaycastTracer> tracers;
 };
