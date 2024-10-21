@@ -61,12 +61,17 @@ public:
 	FVector VaultPos;
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
+	UFUNCTION()
 	void SetFire(const FInputActionValue& value);
+	UFUNCTION()
 	void Jumping();
+	UFUNCTION()
 	void Sprint();
 	void UpdateDirection();
+	UFUNCTION()
 	void Dash();
 	bool GetFireInput();
 	FVector2D GetMovementVector();
+	UFUNCTION()
 	void Vault();
 };

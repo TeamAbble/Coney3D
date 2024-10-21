@@ -69,23 +69,32 @@ void ABaseWeapon::TryFire()
 			UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
 		}
 		accumulatedSpeadCurrent += accumulatedSpeadPerShot;
-		CreateTracer(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
+		CreateProjectile_Implementation(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
 	}
 
 }
-void ABaseWeapon::CreateTracer(FVector traceStart, FVector traceEnd)
+
+
+void ABaseWeapon::CreateProjectile_Implementation(FVector traceStart, FVector traceEnd)
 {
+	//Changed from hitscan weapon to projectile weapon.
+	//The parameters will be kept for other weapons that might need it later on.
 	FActorSpawnParameters parameters = FActorSpawnParameters();
 	parameters.Owner = this;
 	parameters.Instigator = GetInstigator();
 	FTransform transform = FTransform();
 	transform.SetLocation(traceStart);
-	transform.SetRotation(FQuat());
-	AHitscanTracer* ht = GetWorld()->SpawnActor<AHitscanTracer>(projectileBlueprint, transform, parameters);
-	ht->start = traceStart;
-	ht->end = traceEnd;
-	ht->additionalLifetime = tracerDeleteTime;
-	ht->distanceIncrement = tracerSpeed / FVector::Distance(traceStart, traceEnd);
+	transform.SetRotation((traceEnd - traceStart).Rotation().Quaternion());
+	AWeaponProjectile* ht = GetWorld()->SpawnActor<AWeaponProjectile>(projectileBlueprint, transform, parameters);
+	ht->projectileSpeed = projectileSpeed;
+	ht->ActorOwner = connectedPlayer;
+	ht->maxRange = maxRange;
+	ht->minRange = minRange;
+	ht->maxDamage = maxDamage;
+	ht->minDamage = minDamage;
+	if (ht->movement) {
+		ht->movement->Velocity = ht->GetActorForwardVector() * projectileSpeed;
+	}
 	UE_LOG(LogTemp, Display, TEXT("created actor spawn parameters"));
 	UE_LOG(LogTemp, Display, TEXT("added tracer to vector"));
 }

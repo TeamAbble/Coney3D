@@ -8,7 +8,7 @@
 #include "NiagaraComponent.h"
 #include "EFireType.h"
 #include "PlayerCharacter.h"
-#include "HitscanTracer.h"
+#include "WeaponProjectile.h"
 #include "BaseWeapon.generated.h"
 
 UCLASS()
@@ -43,7 +43,7 @@ public:
 	/// </summary>
 	/// <param name="traceStart"></param>
 	/// <param name="traceEnd"></param>
-	void CreateTracer(FVector traceStart, FVector traceEnd);
+	UFUNCTION(Server, Reliable) void CreateProjectile(FVector traceStart, FVector traceEnd);
 	void ResetFired();
 	/// <summary>
 	/// Is this weapon currently able to fire?
@@ -91,7 +91,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpreadDecay = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float hipFireSpreadAngle = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxRange = 10000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float minRange = 200.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Damage") float maxDamage = 12.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Damage") float minDamage = 0.f;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	bool fireInput;
@@ -105,7 +108,7 @@ public:
 	TEnumAsByte<ECollisionChannel> traceChannelProperty = ECC_Pawn;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") TSubclassOf<class AHitscanTracer> projectileBlueprint;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerSpeed = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") TSubclassOf<class AWeaponProjectile> projectileBlueprint;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float projectileSpeed = 500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerDeleteTime = 2.f;
 };
