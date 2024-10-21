@@ -98,7 +98,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	bool fireInput;
-	UPROPERTY(EditAnywhere, Category = "Weapon - References") APlayerCharacter* connectedPlayer;
+	UPROPERTY(EditAnywhere, Category = "Weapon - References", Replicated) APlayerCharacter* connectedPlayer;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,  Category = "Weapon - References") USceneComponent* muzzlePoint;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - References") FVector muzzlePointPosition;
 	UPROPERTY(EditAnywhere, Category = "Weapon - Visuals") UNiagaraSystem* muzzleFlashSystem;
@@ -111,4 +111,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Visuals") TSubclassOf<class AWeaponProjectile> projectileBlueprint;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float projectileSpeed = 500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerDeleteTime = 2.f;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

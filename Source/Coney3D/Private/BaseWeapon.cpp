@@ -2,7 +2,7 @@
 
 #include "BaseWeapon.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Net/UnrealNetwork.h"
 // Sets default values
 ABaseWeapon::ABaseWeapon()
 {
@@ -21,6 +21,7 @@ void ABaseWeapon::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Set Time Between rounds on " + GetName() + " to " + FString::SanitizeFloat(timeBetweenShots));
 	}
 	canFire = true;
+	bReplicates = true;
 	currentAmmo = maxAmmo;
 }
 
@@ -154,5 +155,10 @@ void ABaseWeapon::Tick(float DeltaTime)
 	//}
 
 	accumulatedSpeadCurrent = FMath::Clamp(accumulatedSpeadCurrent - DeltaTime * accumulatedSpreadDecay, 0, maxAccumulatedSpreadAngle);
+}
+
+void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABaseWeapon, connectedPlayer);
 }
 
