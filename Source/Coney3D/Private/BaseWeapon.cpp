@@ -24,7 +24,7 @@ void ABaseWeapon::BeginPlay()
 	currentAmmo = maxAmmo;
 }
 
-void ABaseWeapon::TryFire()
+void ABaseWeapon::TryFire_Implementation()
 {
 	if (GEngine) {
 		//Lol
@@ -69,13 +69,13 @@ void ABaseWeapon::TryFire()
 			UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
 		}
 		accumulatedSpeadCurrent += accumulatedSpeadPerShot;
-		CreateProjectile_Implementation(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
+		CreateProjectile(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
 	}
 
 }
 
 
-void ABaseWeapon::CreateProjectile_Implementation(FVector traceStart, FVector traceEnd)
+void ABaseWeapon::CreateProjectile(FVector traceStart, FVector traceEnd)
 {
 	//Changed from hitscan weapon to projectile weapon.
 	//The parameters will be kept for other weapons that might need it later on.

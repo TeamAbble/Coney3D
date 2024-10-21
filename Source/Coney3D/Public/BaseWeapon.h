@@ -37,13 +37,13 @@ public:
 	/// <summary>
 	/// performs a line trace with some mildly annoying maths to shoot a target
 	/// </summary>
-	void TryFire();
+	UFUNCTION(Server, Reliable) void TryFire();
 	/// <summary>
 	/// Uses information from the linetrace performed by TryFire() to spawn and set up a tracer.
 	/// </summary>
 	/// <param name="traceStart"></param>
 	/// <param name="traceEnd"></param>
-	UFUNCTION(Server, Reliable) void CreateProjectile(FVector traceStart, FVector traceEnd);
+	void CreateProjectile(FVector traceStart, FVector traceEnd);
 	void ResetFired();
 	/// <summary>
 	/// Is this weapon currently able to fire?

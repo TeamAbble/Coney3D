@@ -20,7 +20,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	if (weaponBlueprint) {
+	if (HasAuthority() && weaponBlueprint) {
 
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
