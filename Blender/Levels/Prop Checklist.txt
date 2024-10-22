@@ -19,3 +19,5 @@ Crane 🟢
 Scaffolding 🟢
 Bucket 🟢
 Portable Toilets 🟢
+Containers🔴
+Brick Stacks 🔴
