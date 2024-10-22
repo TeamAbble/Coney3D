@@ -2,7 +2,7 @@
 
 #include "BaseWeapon.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Net/UnrealNetwork.h"
 // Sets default values
 ABaseWeapon::ABaseWeapon()
 {
@@ -21,10 +21,11 @@ void ABaseWeapon::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Set Time Between rounds on " + GetName() + " to " + FString::SanitizeFloat(timeBetweenShots));
 	}
 	canFire = true;
+	bReplicates = true;
 	currentAmmo = maxAmmo;
 }
 
-void ABaseWeapon::TryFire()
+void ABaseWeapon::TryFire_Implementation()
 {
 	if (GEngine) {
 		//Lol
@@ -69,23 +70,32 @@ void ABaseWeapon::TryFire()
 			UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
 		}
 		accumulatedSpeadCurrent += accumulatedSpeadPerShot;
-		CreateTracer(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
+		CreateProjectile(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
 	}
 
 }
-void ABaseWeapon::CreateTracer(FVector traceStart, FVector traceEnd)
+
+
+void ABaseWeapon::CreateProjectile(FVector traceStart, FVector traceEnd)
 {
+	//Changed from hitscan weapon to projectile weapon.
+	//The parameters will be kept for other weapons that might need it later on.
 	FActorSpawnParameters parameters = FActorSpawnParameters();
 	parameters.Owner = this;
 	parameters.Instigator = GetInstigator();
 	FTransform transform = FTransform();
 	transform.SetLocation(traceStart);
-	transform.SetRotation(FQuat());
-	AHitscanTracer* ht = GetWorld()->SpawnActor<AHitscanTracer>(projectileBlueprint, transform, parameters);
-	ht->start = traceStart;
-	ht->end = traceEnd;
-	ht->additionalLifetime = tracerDeleteTime;
-	ht->distanceIncrement = tracerSpeed / FVector::Distance(traceStart, traceEnd);
+	transform.SetRotation((traceEnd - traceStart).Rotation().Quaternion());
+	AWeaponProjectile* ht = GetWorld()->SpawnActor<AWeaponProjectile>(projectileBlueprint, transform, parameters);
+	ht->projectileSpeed = projectileSpeed;
+	ht->ActorOwner = connectedPlayer;
+	ht->maxRange = maxRange;
+	ht->minRange = minRange;
+	ht->maxDamage = maxDamage;
+	ht->minDamage = minDamage;
+	if (ht->movement) {
+		ht->movement->Velocity = ht->GetActorForwardVector() * projectileSpeed;
+	}
 	UE_LOG(LogTemp, Display, TEXT("created actor spawn parameters"));
 	UE_LOG(LogTemp, Display, TEXT("added tracer to vector"));
 }
@@ -145,5 +155,10 @@ void ABaseWeapon::Tick(float DeltaTime)
 	//}
 
 	accumulatedSpeadCurrent = FMath::Clamp(accumulatedSpeadCurrent - DeltaTime * accumulatedSpreadDecay, 0, maxAccumulatedSpreadAngle);
+}
+
+void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABaseWeapon, connectedPlayer);
 }
 
