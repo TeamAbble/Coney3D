@@ -31,6 +31,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) TSubclassOf<UDamageType> damageType;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float distanceTravelled;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float expiryDistance = 100000;
+	float collisionImpulseMultiplier;
 	float projectileSpeed;
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
