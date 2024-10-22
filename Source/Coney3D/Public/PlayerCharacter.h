@@ -56,7 +56,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") USceneComponent* aimRef;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup") UCameraComponent* playerCam;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") TSubclassOf<class ABaseWeapon> weaponBlueprint;
-	
+	bool sprinting;
 	bool bShouldClimb;
 	FVector VaultPos;
 	void Move(const FInputActionValue& value);
@@ -64,14 +64,18 @@ public:
 	UFUNCTION()
 	void SetFire(const FInputActionValue& value);
 	UFUNCTION()
+	void SetSprint(const FInputActionValue& value);
+	UFUNCTION()
 	void Jumping();
-	UFUNCTION()
-	void Sprint();
+	UFUNCTION(Server, Unreliable)
+	void Sprint(bool sprint);
 	void UpdateDirection();
-	UFUNCTION()
-	void Dash();
+	UFUNCTION(Server, Reliable)
+	void Dash(FVector inputVector);
+	void TryDash();
 	bool GetFireInput();
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();
+
 };

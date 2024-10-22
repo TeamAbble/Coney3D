@@ -6,6 +6,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "BaseWeapon.h"
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -56,9 +58,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APlayerCharacter::Dash);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &APlayerCharacter::Sprint);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::Sprint);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APlayerCharacter::TryDash);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &APlayerCharacter::SetSprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::SetSprint);
 		//Registers the fire callback for both started and completed
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SetFire);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &APlayerCharacter::SetFire);
@@ -67,6 +69,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 }
 void APlayerCharacter::SetFire(const FInputActionValue& value) {
 	fireInput = value.Get<bool>();
+}
+void APlayerCharacter::SetSprint(const FInputActionValue& value) {
+	sprinting = value.Get<bool>();
+	Sprint(sprinting);
 }
 void APlayerCharacter::Move(const FInputActionValue& value)
 {
@@ -102,16 +108,10 @@ void APlayerCharacter::Jumping()
 	Jump();
 }
 
-void APlayerCharacter::Sprint()
+void APlayerCharacter::Sprint_Implementation(bool sprint)
 {
-	if (GetCharacterMovement()->MaxWalkSpeed == WalkSpeed) {
-		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	}
-	else {
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-
-	}
-	
+	sprinting = sprint;
+	GetCharacterMovement()->MaxWalkSpeed = sprinting ? SprintSpeed : WalkSpeed;
 }
 
 void APlayerCharacter::UpdateDirection()
@@ -120,7 +120,7 @@ void APlayerCharacter::UpdateDirection()
 	RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 }
 
-void APlayerCharacter::Dash()
+void APlayerCharacter::Dash_Implementation(FVector inputVector)
 {
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
@@ -128,14 +128,19 @@ void APlayerCharacter::Dash()
 
 	}
 	FVector Up = FVector(0, 0, DashUpwardVelocity);
-	if (MovementVector != FVector2D(0, 0)) {
-		LaunchCharacter(FVector(ForwardDir * MovementVector.Y + RightDir * MovementVector.X) * DashSpeed + Up, true, true);
+	if (inputVector != FVector(0, 0, 0)) {
+		LaunchCharacter(FVector(ForwardDir * inputVector.Y + RightDir * inputVector.X) * DashSpeed + Up, true, true);
 	}
 	else {
 		UpdateDirection();
 		LaunchCharacter(ForwardDir * DashSpeed + Up, true, true);
 	}
 	
+}
+
+void APlayerCharacter::TryDash()
+{
+	Dash(ForwardDir * MovementVector.Y + RightDir * MovementVector.X);
 }
 
 bool APlayerCharacter::GetFireInput()
@@ -193,5 +198,3 @@ void APlayerCharacter::Vault()
 		VaultPos = { 0,0,0 };
 	}
 }
-
-
