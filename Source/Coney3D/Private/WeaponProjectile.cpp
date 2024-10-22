@@ -20,14 +20,18 @@ void AWeaponProjectile::BeginPlay()
 	distanceTravelled = 0;
 	collider = GetComponentByClass<USphereComponent>();
 	if (collider) {
-		collider->OnComponentHit.AddDynamic(this, &AWeaponProjectile::OnHit);
+		if (GIsServer) {
+			collider->OnComponentHit.AddDynamic(this, &AWeaponProjectile::OnHit);
+		}
 		collider->SetCollisionProfileName(TEXT("Projectile"));
 	}
 	movement = GetComponentByClass<UProjectileMovementComponent>();
 	if (movement) {
-		movement->bRotationFollowsVelocity = true;
-		
+		if (!GIsServer) {
+			movement->ProjectileGravityScale = 0;
+		}
 	}
+	
 }
 
 // Called every frame
@@ -55,7 +59,7 @@ void AWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 
 	if (OtherActor != ActorOwner && OtherActor != this) {
 		if (OtherComponent->IsSimulatingPhysics()) {
-			OtherComponent->AddImpulseAtLocation(movement->Velocity, GetActorLocation());
+			OtherComponent->AddImpulseAtLocation(movement->Velocity * collisionImpulseMultiplier, GetActorLocation());
 		}
 		if (OtherActor->CanBeDamaged()) {
 

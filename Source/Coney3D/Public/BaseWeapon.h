@@ -95,6 +95,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Damage") float maxDamage = 12.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Damage") float minDamage = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Damage") float collisionImpulseMultiplier = 0.f;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	bool fireInput;

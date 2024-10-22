@@ -93,6 +93,7 @@ void ABaseWeapon::CreateProjectile(FVector traceStart, FVector traceEnd)
 	ht->minRange = minRange;
 	ht->maxDamage = maxDamage;
 	ht->minDamage = minDamage;
+	ht->collisionImpulseMultiplier = collisionImpulseMultiplier;
 	if (ht->movement) {
 		ht->movement->Velocity = ht->GetActorForwardVector() * projectileSpeed;
 	}
