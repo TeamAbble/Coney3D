@@ -30,6 +30,10 @@ protected:
 	FVector2D MovementVector;
 	FRotator Rotation;
 	FRotator YawRotation;
+	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
+	float Health = 50.0f;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)override;
+
 
 public:	
 	// Called every frame
