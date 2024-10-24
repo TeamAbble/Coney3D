@@ -129,8 +129,8 @@ void APlayerCharacter::Sprint_Implementation(bool sprint)
 
 void APlayerCharacter::UpdateDirection()
 {
-	ForwardDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	ForwardDir = GetActorForwardVector();
+	RightDir = GetActorRightVector();
 }
 
 void APlayerCharacter::Dash_Implementation(FVector inputVector)
@@ -153,6 +153,7 @@ void APlayerCharacter::Dash_Implementation(FVector inputVector)
 
 void APlayerCharacter::TryDash()
 {
+	UpdateDirection();
 	Dash(ForwardDir * MovementVector.Y + RightDir * MovementVector.X);
 }
 

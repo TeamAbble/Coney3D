@@ -31,6 +31,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) TSubclassOf<UDamageType> damageType;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float distanceTravelled;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float expiryDistance = 100000;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) TSubclassOf<AActor> hitEffect;
 	float collisionImpulseMultiplier;
 	float projectileSpeed;
 	UFUNCTION()
