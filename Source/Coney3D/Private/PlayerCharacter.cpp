@@ -41,6 +41,19 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)
+{
+	Health -= DamageAmount;
+	//if (Health <= 0) {
+	//Do whatever we need to do when the player dies
+	//}
+	
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
+	}
+	return DamageAmount;
+}
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
