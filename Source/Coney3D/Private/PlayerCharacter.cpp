@@ -59,6 +59,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	aimRef->SetWorldRotation(GetBaseAimRotation());
 }
 
 // Called to bind functionality to input
@@ -80,6 +81,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 
 }
+
 void APlayerCharacter::SetFire(const FInputActionValue& value) {
 	fireInput = value.Get<bool>();
 }
@@ -116,6 +118,20 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 	}
 }
 
+void APlayerCharacter::UpdateAimRefPosition_Server_Implementation(FQuat rotation)
+{
+	if (aimRef) {
+		aimRef->SetWorldRotation(rotation);
+		UpdateAimRefPosition_Client(rotation);
+	}
+}
+void APlayerCharacter::UpdateAimRefPosition_Client_Implementation(FQuat rotation)
+{
+	if (aimRef && GetRemoteRole() != ENetRole::ROLE_Authority) 
+	{
+		aimRef->SetWorldRotation(rotation);
+	}
+}
 void APlayerCharacter::Jumping()
 {
 	Jump();
@@ -133,16 +149,21 @@ void APlayerCharacter::UpdateDirection()
 	RightDir = GetActorRightVector();
 }
 
-void APlayerCharacter::Dash_Implementation(FVector inputVector)
+void APlayerCharacter::Dash_Implementation(FVector forward, FVector right)
 {
+	if (!CanDash)
+		return;
+
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.Y));
 
 	}
 	FVector Up = FVector(0, 0, DashUpwardVelocity);
-	if (inputVector != FVector(0, 0, 0)) {
-		LaunchCharacter(FVector(ForwardDir * inputVector.Y + RightDir * inputVector.X) * DashSpeed + Up, true, true);
+	if (forward != FVector::Zero() || right != FVector::Zero()) {
+		FVector vec = (forward + right);
+		vec.Normalize();
+		LaunchCharacter(vec * DashSpeed + Up, true, true);
 	}
 	else {
 		UpdateDirection();
@@ -155,11 +176,8 @@ void APlayerCharacter::Dash_Implementation(FVector inputVector)
 
 void APlayerCharacter::TryDash()
 {
-	if (CanDash) {
-		UpdateDirection();
-		Dash(ForwardDir * MovementVector.Y + RightDir * MovementVector.X);
-	}
-	
+	UpdateDirection();
+	Dash(ForwardDir * MovementVector.Y, RightDir * MovementVector.X);	
 }
 
 void APlayerCharacter::ResetDash()

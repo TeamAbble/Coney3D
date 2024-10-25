@@ -21,6 +21,7 @@ void AWeaponProjectile::BeginPlay()
 	collider = GetComponentByClass<USphereComponent>();
 	if (GIsServer) {
 		collider->OnComponentHit.AddDynamic(this, &AWeaponProjectile::OnHit);
+		collider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponProjectile::BeginOverlap);
 		collider->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
 	}
 	movement = GetComponentByClass<UProjectileMovementComponent>();
@@ -48,7 +49,10 @@ void AWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 {
 	if (!GIsServer || !movement || !ActorOwner)
 		return;
+	DealDamage(HitComponent, OtherActor, OtherComponent, Hit);
+}
 
+void AWeaponProjectile::DealDamage(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& Hit) {
 	if (OtherActor) {
 		if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(-1, 0.3f, FColor::Yellow, "Bullet hit " + OtherActor->GetName());
@@ -77,6 +81,13 @@ void AWeaponProjectile::Explode()
 	FTransform transform = FTransform(GetActorRotation(), GetActorLocation());
 	AActor* projectile = GetWorld()->SpawnActor<AActor>(hitEffect, params);
 	Destroy();
+}
+
+void AWeaponProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!GIsServer || !movement || !ActorOwner)
+		return;
+	DealDamage(OverlappedComponent, OtherActor, OtherComp, SweepResult);
 }
 
 

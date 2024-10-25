@@ -30,11 +30,6 @@ void ABaseWeapon::TryFire_Implementation()
 	if (GEngine) {
 		//Lol
 	}
-	if (muzzleFlashInstance) {
-		muzzleFlashInstance->Activate();
-	}
-	fired = true;
-	GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots,false);
 
 	//lets shoot shit
 	for (size_t i = 0; i < static_cast<int16>(fireIterations + 1); i++)
@@ -134,8 +129,14 @@ void ABaseWeapon::Tick(float DeltaTime)
 		}
 
 		if (!fired && fireInput && (chargeTime == 0 || currentCharge >= chargeTime) && (firePressed || fireMode != single)) {
+			if (muzzleFlashInstance) {
+				muzzleFlashInstance->Activate(true);
+			}
+			fired = true;
 			TryFire();
 			firePressed = true;
+			GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots, false);
+
 		}
 	}
 	else {
