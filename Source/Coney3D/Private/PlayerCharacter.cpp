@@ -148,13 +148,23 @@ void APlayerCharacter::Dash_Implementation(FVector inputVector)
 		UpdateDirection();
 		LaunchCharacter(ForwardDir * DashSpeed + Up, true, true);
 	}
+	CanDash = false;
+	GetWorld()->GetTimerManager().SetTimer(DashTimer, this, &APlayerCharacter::ResetDash, DashCooldown, false);
 	
 }
 
 void APlayerCharacter::TryDash()
 {
-	UpdateDirection();
-	Dash(ForwardDir * MovementVector.Y + RightDir * MovementVector.X);
+	if (CanDash) {
+		UpdateDirection();
+		Dash(ForwardDir * MovementVector.Y + RightDir * MovementVector.X);
+	}
+	
+}
+
+void APlayerCharacter::ResetDash()
+{
+	CanDash = true;
 }
 
 bool APlayerCharacter::GetFireInput()

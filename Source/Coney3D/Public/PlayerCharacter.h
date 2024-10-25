@@ -30,6 +30,9 @@ protected:
 	FVector2D MovementVector;
 	FRotator Rotation;
 	FRotator YawRotation;
+	FTimerHandle DashTimer;
+	bool CanDash = true;
+	
 	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
 	float Health = 50.0f;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)override;
@@ -52,6 +55,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashUpwardVelocity;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float WalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float SprintSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashCooldown;
 	
 
 	float currentTime;
@@ -77,6 +82,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Dash(FVector inputVector);
 	void TryDash();
+	void ResetDash();
 	bool GetFireInput();
 	FVector2D GetMovementVector();
 	UFUNCTION()
