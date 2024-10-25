@@ -56,7 +56,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float WalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float SprintSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashCooldown;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashCooldown=2;
 	
 
 	float currentTime;
