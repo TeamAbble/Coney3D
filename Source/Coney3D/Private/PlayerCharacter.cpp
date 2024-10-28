@@ -38,6 +38,8 @@ void APlayerCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+		PlayerController->PlayerCameraManager->ViewPitchMax = 80.f;
+		PlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
 	}
 }
 
@@ -49,8 +51,14 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	//}
 	
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
 	}
+	
+	AWeaponProjectile* proj = Cast<AWeaponProjectile>(DamageDealer);
+	if (proj) {
+		//We'll do something here maybe
+	}
+
 	return DamageAmount;
 }
 

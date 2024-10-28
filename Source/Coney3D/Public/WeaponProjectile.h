@@ -28,6 +28,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) USphereComponent* collider;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) UProjectileMovementComponent* movement;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) AActor* ActorOwner;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) bool useRadialDamage;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) float minRadialDamage;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	float maxRadialDamage;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	float minDamageRadius;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	float maxDamageRadius;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) TSubclassOf<UDamageType> damageType;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float distanceTravelled;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float expiryDistance = 100000;

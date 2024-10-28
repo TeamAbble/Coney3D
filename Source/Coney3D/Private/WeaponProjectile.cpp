@@ -65,8 +65,14 @@ void AWeaponProjectile::DealDamage(UPrimitiveComponent* HitComponent, AActor* Ot
 			}
 			if (OtherActor->CanBeDamaged()) {
 
-				float damageDealt = FMath::Lerp(maxDamage, minDamage, UKismetMathLibrary::NormalizeToRange(distanceTravelled, minRange, maxRange));
-				UGameplayStatics::ApplyDamage(OtherActor, damageDealt, GetInstigatorController(), ActorOwner, damageType);
+				if (useRadialDamage) {
+					UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), maxRadialDamage, minRadialDamage, GetActorLocation(), minDamageRadius, maxDamageRadius, 1, damageType, 
+						TArray<AActor*,FDefaultAllocator>(), ActorOwner);
+				}
+				else {
+					float damageDealt = FMath::Lerp(maxDamage, minDamage, UKismetMathLibrary::NormalizeToRange(distanceTravelled, minRange, maxRange));
+					UGameplayStatics::ApplyDamage(OtherActor, damageDealt, GetInstigatorController(), ActorOwner, damageType);
+				}
 			}
 		}
 	}

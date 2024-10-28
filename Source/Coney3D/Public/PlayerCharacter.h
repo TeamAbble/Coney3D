@@ -91,5 +91,6 @@ public:
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();
+	UPROPERTY(BlueprintReadWrite) bool paused;
 
 };
