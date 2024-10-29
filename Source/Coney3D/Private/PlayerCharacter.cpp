@@ -21,6 +21,7 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	SpawnLocation = GetActorLocation();
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	if (GetLocalRole() == ROLE_Authority && weaponBlueprint) {
 
@@ -46,9 +47,9 @@ void APlayerCharacter::BeginPlay()
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)
 {
 	Health -= DamageAmount;
-	//if (Health <= 0) {
-	//Do whatever we need to do when the player dies
-	//}
+	if (Health <= 0) {
+		Die();
+	}
 	
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
@@ -196,6 +197,20 @@ void APlayerCharacter::ResetDash()
 bool APlayerCharacter::GetFireInput()
 {
 	return fireInput;
+}
+
+void APlayerCharacter::Die()
+{
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Dead");
+		Respawn();
+	}
+}
+
+void APlayerCharacter::Respawn()
+{
+	Health = MaxHealth;
+	SetActorLocation(SpawnLocation);
 }
 
 
