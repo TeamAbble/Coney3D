@@ -30,8 +30,14 @@ protected:
 	FVector2D MovementVector;
 	FRotator Rotation;
 	FRotator YawRotation;
+	FTimerHandle DashTimer;
+	bool CanDash = true;
+
+	bool Dead = false; 
+	
 	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
-	float Health = 50.0f;
+	float MaxHealth = 250.0f;
+	float Health = MaxHealth;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)override;
 
 
@@ -48,10 +54,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* SprintAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* DashAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* FireAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health and Damage") FVector SpawnLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashUpwardVelocity;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float WalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float SprintSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashCooldown=2;
 	
 
 	float currentTime;
@@ -65,6 +74,10 @@ public:
 	FVector VaultPos;
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
+	UFUNCTION(Server, Unreliable)
+	void UpdateAimRefPosition_Server(FQuat rotation);
+	UFUNCTION(Client, Unreliable)
+	void UpdateAimRefPosition_Client(FQuat rotation);
 	UFUNCTION()
 	void SetFire(const FInputActionValue& value);
 	UFUNCTION()
@@ -75,11 +88,15 @@ public:
 	void Sprint(bool sprint);
 	void UpdateDirection();
 	UFUNCTION(Server, Reliable)
-	void Dash(FVector inputVector);
+	void Dash(FVector forward, FVector right);
 	void TryDash();
+	void ResetDash();
 	bool GetFireInput();
+	void Die();
+	void Respawn();
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();
+	UPROPERTY(BlueprintReadWrite) bool paused;
 
 };

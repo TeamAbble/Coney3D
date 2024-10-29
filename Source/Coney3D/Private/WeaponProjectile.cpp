@@ -19,11 +19,10 @@ void AWeaponProjectile::BeginPlay()
 	Super::BeginPlay();
 	distanceTravelled = 0;
 	collider = GetComponentByClass<USphereComponent>();
-	if (collider) {
-		if (GIsServer) {
-			collider->OnComponentHit.AddDynamic(this, &AWeaponProjectile::OnHit);
-		}
-		collider->SetCollisionProfileName(TEXT("Projectile"));
+	if (GIsServer) {
+		collider->OnComponentHit.AddDynamic(this, &AWeaponProjectile::OnHit);
+		collider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponProjectile::BeginOverlap);
+		collider->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
 	}
 	movement = GetComponentByClass<UProjectileMovementComponent>();
 	if (movement) {
@@ -41,38 +40,60 @@ void AWeaponProjectile::Tick(float DeltaTime)
 	distanceTravelled += DeltaTime * GetVelocity().Size();
 
 	if (distanceTravelled >= expiryDistance) {
-		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Projectile expired");
-		}
+
 		Explode();
 	}
 }
 
 void AWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!GIsServer || !movement || !ActorOwner || !OtherActor || !OtherComponent || !HitComponent)
+	if (!GIsServer || !movement || !ActorOwner)
 		return;
+	DealDamage(HitComponent, OtherActor, OtherComponent, Hit);
+}
 
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Bullet hit " + OtherActor->GetName());
-	}
-
-	if (OtherActor != ActorOwner && OtherActor != this) {
-		if (OtherComponent->IsSimulatingPhysics()) {
-			OtherComponent->AddImpulseAtLocation(movement->Velocity * collisionImpulseMultiplier, GetActorLocation());
+void AWeaponProjectile::DealDamage(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& Hit) {
+	if (OtherActor) {
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 0.3f, FColor::Yellow, "Bullet hit " + OtherActor->GetName());
 		}
-		if (OtherActor->CanBeDamaged()) {
+		if (OtherActor != ActorOwner && OtherActor != this) {
+			if (OtherComponent) {
+				if (OtherComponent->IsSimulatingPhysics()) {
+					OtherComponent->AddImpulseAtLocation(movement->Velocity * collisionImpulseMultiplier, GetActorLocation());
+				}
+			}
+			if (OtherActor->CanBeDamaged()) {
 
-			float damageDealt = FMath::Lerp(maxDamage, minDamage, UKismetMathLibrary::NormalizeToRange(distanceTravelled, minRange, maxRange));
-			UGameplayStatics::ApplyDamage(OtherActor, damageDealt, GetInstigatorController(), ActorOwner, damageType);
+				if (useRadialDamage) {
+					UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), maxRadialDamage, minRadialDamage, GetActorLocation(), minDamageRadius, maxDamageRadius, 1, damageType, 
+						TArray<AActor*,FDefaultAllocator>(), ActorOwner);
+				}
+				else {
+					float damageDealt = FMath::Lerp(maxDamage, minDamage, UKismetMathLibrary::NormalizeToRange(distanceTravelled, minRange, maxRange));
+					UGameplayStatics::ApplyDamage(OtherActor, damageDealt, GetInstigatorController(), ActorOwner, damageType);
+				}
+			}
 		}
-		Explode();
 	}
+	Explode();
 }
 
 void AWeaponProjectile::Explode()
 {
+	FActorSpawnParameters params = FActorSpawnParameters();
+	params.Owner = this;
+	params.Instigator = GetInstigator();
+	FTransform transform = FTransform(GetActorRotation(), GetActorLocation());
+	AActor* projectile = GetWorld()->SpawnActor<AActor>(hitEffect, params);
 	Destroy();
+}
+
+void AWeaponProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!GIsServer || !movement || !ActorOwner)
+		return;
+	DealDamage(OverlappedComponent, OtherActor, OtherComp, SweepResult);
 }
 
 

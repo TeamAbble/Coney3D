@@ -28,13 +28,28 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) USphereComponent* collider;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) UProjectileMovementComponent* movement;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) AActor* ActorOwner;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) bool useRadialDamage;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) float minRadialDamage;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	float maxRadialDamage;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	float minDamageRadius;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	float maxDamageRadius;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) TSubclassOf<UDamageType> damageType;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float distanceTravelled;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float expiryDistance = 100000;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) TSubclassOf<AActor> hitEffect;
 	float collisionImpulseMultiplier;
 	float projectileSpeed;
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION()
+	void DealDamage(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& Hit);
+	UFUNCTION()
 	virtual void Explode();
+	UFUNCTION()
+	void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
 };

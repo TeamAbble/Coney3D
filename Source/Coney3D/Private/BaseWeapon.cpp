@@ -29,13 +29,7 @@ void ABaseWeapon::TryFire_Implementation()
 {
 	if (GEngine) {
 		//Lol
-		GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, "Fired Weapon: " + GetName());
 	}
-	if (muzzleFlashInstance) {
-		muzzleFlashInstance->Activate();
-	}
-	fired = true;
-	GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots,false);
 
 	//lets shoot shit
 	for (size_t i = 0; i < static_cast<int16>(fireIterations + 1); i++)
@@ -58,15 +52,9 @@ void ABaseWeapon::TryFire_Implementation()
 		//DrawDebugLine(GetWorld(), traceStart, traceEnd, hit.bBlockingHit ? FColor::Green : FColor::Red, false, .5f, 0, 2);
 
 		if (hit.bBlockingHit && IsValid(hit.GetActor())) {
-			if (GEngine) {
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Hit actor: " + hit.GetActor()->GetName());
-			}
 			UE_LOG(LogTemp, Display, TEXT("actor hit: %s"), *hit.GetActor()->GetName());
 		}
 		else {
-			if (GEngine) {
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, "Did not hit actor");
-			}
 			UE_LOG(LogTemp, Display, TEXT("Nothing hit"));
 		}
 		accumulatedSpeadCurrent += accumulatedSpeadPerShot;
@@ -115,12 +103,12 @@ void ABaseWeapon::Tick(float DeltaTime)
 	bool firePressed = false;
 	if (!connectedPlayer) {
 		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "ERROR! NO PLAYER CHARACTER OWNS WEAPON: " + GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 0.05f, FColor::Red, "ERROR! NO PLAYER CHARACTER OWNS WEAPON: " + GetName());
 		}
 	}
 	if (fireMode == none) {
 		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "FIREMODE IS SET TO NONE ON WEAPON: " + GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 0.05f, FColor::Red, "FIREMODE IS SET TO NONE ON WEAPON: " + GetName());
 		}
 	}
 	else {
@@ -141,8 +129,14 @@ void ABaseWeapon::Tick(float DeltaTime)
 		}
 
 		if (!fired && fireInput && (chargeTime == 0 || currentCharge >= chargeTime) && (firePressed || fireMode != single)) {
+			if (muzzleFlashInstance) {
+				muzzleFlashInstance->Activate(true);
+			}
+			fired = true;
 			TryFire();
 			firePressed = true;
+			GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots, false);
+
 		}
 	}
 	else {

@@ -21,6 +21,7 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	SpawnLocation = GetActorLocation();
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	if (GetLocalRole() == ROLE_Authority && weaponBlueprint) {
 
@@ -38,19 +39,27 @@ void APlayerCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+		PlayerController->PlayerCameraManager->ViewPitchMax = 80.f;
+		PlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
 	}
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)
 {
 	Health -= DamageAmount;
-	//if (Health <= 0) {
-	//Do whatever we need to do when the player dies
-	//}
+	if (Health <= 0) {
+		Die();
+	}
 	
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
 	}
+	
+	AWeaponProjectile* proj = Cast<AWeaponProjectile>(DamageDealer);
+	if (proj) {
+		//We'll do something here maybe
+	}
+
 	return DamageAmount;
 }
 
@@ -59,6 +68,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	aimRef->SetWorldRotation(GetBaseAimRotation());
 }
 
 // Called to bind functionality to input
@@ -80,6 +90,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 
 }
+
 void APlayerCharacter::SetFire(const FInputActionValue& value) {
 	fireInput = value.Get<bool>();
 }
@@ -116,6 +127,20 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 	}
 }
 
+void APlayerCharacter::UpdateAimRefPosition_Server_Implementation(FQuat rotation)
+{
+	if (aimRef) {
+		aimRef->SetWorldRotation(rotation);
+		UpdateAimRefPosition_Client(rotation);
+	}
+}
+void APlayerCharacter::UpdateAimRefPosition_Client_Implementation(FQuat rotation)
+{
+	if (aimRef && GetRemoteRole() != ENetRole::ROLE_Authority) 
+	{
+		aimRef->SetWorldRotation(rotation);
+	}
+}
 void APlayerCharacter::Jumping()
 {
 	Jump();
@@ -129,36 +154,63 @@ void APlayerCharacter::Sprint_Implementation(bool sprint)
 
 void APlayerCharacter::UpdateDirection()
 {
-	ForwardDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	ForwardDir = GetActorForwardVector();
+	RightDir = GetActorRightVector();
 }
 
-void APlayerCharacter::Dash_Implementation(FVector inputVector)
+void APlayerCharacter::Dash_Implementation(FVector forward, FVector right)
 {
+	if (!CanDash)
+		return;
+
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.Y));
 
 	}
 	FVector Up = FVector(0, 0, DashUpwardVelocity);
-	if (inputVector != FVector(0, 0, 0)) {
-		LaunchCharacter(FVector(ForwardDir * inputVector.Y + RightDir * inputVector.X) * DashSpeed + Up, true, true);
+	if (forward != FVector::Zero() || right != FVector::Zero()) {
+		FVector vec = (forward + right);
+		vec.Normalize();
+		LaunchCharacter(vec * DashSpeed + Up, true, true);
 	}
 	else {
 		UpdateDirection();
 		LaunchCharacter(ForwardDir * DashSpeed + Up, true, true);
 	}
+	CanDash = false;
+	GetWorld()->GetTimerManager().SetTimer(DashTimer, this, &APlayerCharacter::ResetDash, DashCooldown, false);
 	
 }
 
 void APlayerCharacter::TryDash()
 {
-	Dash(ForwardDir * MovementVector.Y + RightDir * MovementVector.X);
+	UpdateDirection();
+	Dash(ForwardDir * MovementVector.Y, RightDir * MovementVector.X);	
+}
+
+void APlayerCharacter::ResetDash()
+{
+	CanDash = true;
 }
 
 bool APlayerCharacter::GetFireInput()
 {
 	return fireInput;
+}
+
+void APlayerCharacter::Die()
+{
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Dead");
+		Respawn();
+	}
+}
+
+void APlayerCharacter::Respawn()
+{
+	Health = MaxHealth;
+	SetActorLocation(SpawnLocation);
 }
 
 
