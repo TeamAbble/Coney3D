@@ -29,6 +29,7 @@ protected:
 	FVector RightDir;
 	FVector2D MovementVector;
 	FRotator Rotation;
+	int points = 0;
 	FRotator YawRotation;
 	FTimerHandle DashTimer;
 	bool CanDash = true;
@@ -92,8 +93,9 @@ public:
 	void TryDash();
 	void ResetDash();
 	bool GetFireInput();
-	void Die();
+	void Die(AActor *OtherPlayer);
 	void Respawn();
+	void GainPoint();
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();

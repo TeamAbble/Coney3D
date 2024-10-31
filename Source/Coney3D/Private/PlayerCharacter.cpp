@@ -48,17 +48,14 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Health -= DamageAmount;
 	if (Health <= 0) {
-		Die();
+		AWeaponProjectile* proj = Cast<AWeaponProjectile>(DamageDealer);
+		if (proj != nullptr) {
+			AActor* ProjOwner = proj->GetActorOwner();
+			UE_LOG(LogTemp, Display, TEXT("GotActor"));
+		}
+		
 	}
 	
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
-	}
-	
-	AWeaponProjectile* proj = Cast<AWeaponProjectile>(DamageDealer);
-	if (proj) {
-		//We'll do something here maybe
-	}
 
 	return DamageAmount;
 }
@@ -164,8 +161,8 @@ void APlayerCharacter::Dash_Implementation(FVector forward, FVector right)
 		return;
 
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.Y));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.Y));
 
 	}
 	FVector Up = FVector(0, 0, DashUpwardVelocity);
@@ -199,10 +196,13 @@ bool APlayerCharacter::GetFireInput()
 	return fireInput;
 }
 
-void APlayerCharacter::Die()
+void APlayerCharacter::Die(AActor *OtherPlayer)
 {
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Dead");
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Dead");
+
+		APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);
+		OtherP->GainPoint();
 		Respawn();
 	}
 }
@@ -211,6 +211,14 @@ void APlayerCharacter::Respawn()
 {
 	Health = MaxHealth;
 	SetActorLocation(SpawnLocation);
+}
+
+void APlayerCharacter::GainPoint()
+{
+	points++;
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green,FString::FromInt(points));
+	}
 }
 
 

@@ -50,6 +50,9 @@ void AWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 	if (!GIsServer || !movement || !ActorOwner)
 		return;
 	DealDamage(HitComponent, OtherActor, OtherComponent, Hit);
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 0.3f, FColor::Red, ActorOwner->GetName());
+	}
 }
 
 void AWeaponProjectile::DealDamage(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& Hit) {
@@ -95,6 +98,12 @@ void AWeaponProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		return;
 	DealDamage(OverlappedComponent, OtherActor, OtherComp, SweepResult);
 }
+
+AActor* AWeaponProjectile::GetActorOwner()
+{
+	return ActorOwner;
+}
+
 
 
 
