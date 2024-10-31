@@ -48,15 +48,8 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Health -= DamageAmount;
 	if (Health <= 0) {
-		AWeaponProjectile* proj = Cast<AWeaponProjectile>(DamageDealer);
-		if (proj != nullptr) {
-			AActor* ProjOwner = proj->GetActorOwner();
-			UE_LOG(LogTemp, Display, TEXT("GotActor"));
-		}
-		
+		Die(DamageDealer);
 	}
-	
-
 	return DamageAmount;
 }
 
@@ -270,4 +263,12 @@ void APlayerCharacter::Vault()
 	else {
 		VaultPos = { 0,0,0 };
 	}
+
+
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APlayerCharacter, Dead);
 }

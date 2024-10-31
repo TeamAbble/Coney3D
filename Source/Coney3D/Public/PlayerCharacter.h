@@ -29,12 +29,11 @@ protected:
 	FVector RightDir;
 	FVector2D MovementVector;
 	FRotator Rotation;
-	int points = 0;
+	UPROPERTY(Replicated) int points = 0;
 	FRotator YawRotation;
 	FTimerHandle DashTimer;
 	bool CanDash = true;
 
-	bool Dead = false; 
 	
 	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
 	float MaxHealth = 250.0f;
@@ -99,6 +98,9 @@ public:
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();
-	UPROPERTY(BlueprintReadWrite) bool paused;
+	UPROPERTY(Replicated);
+	bool Dead = false;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 
 };
