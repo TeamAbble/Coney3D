@@ -46,9 +46,12 @@ void APlayerCharacter::BeginPlay()
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)
 {
-	Health -= DamageAmount;
-	if (Health <= 0) {
-		Die(DamageDealer);
+	if (Health>0) {
+		Health -= DamageAmount;
+		if (Health <= 0) {
+			Die(DamageDealer);
+		}
+		
 	}
 	return DamageAmount;
 }
@@ -192,11 +195,11 @@ bool APlayerCharacter::GetFireInput()
 void APlayerCharacter::Die(AActor *OtherPlayer)
 {
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Dead");
-
+		SetActorHiddenInGame(true);
 		APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);
 		OtherP->GainPoint();
-		Respawn();
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &APlayerCharacter::Respawn, RespawnTime, false);
+		IsDead = true;
 	}
 }
 
@@ -204,6 +207,8 @@ void APlayerCharacter::Respawn()
 {
 	Health = MaxHealth;
 	SetActorLocation(SpawnLocation);
+	SetActorHiddenInGame(false);
+	IsDead = false;
 }
 
 void APlayerCharacter::GainPoint()
