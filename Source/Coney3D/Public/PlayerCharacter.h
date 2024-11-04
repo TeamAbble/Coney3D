@@ -39,6 +39,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
 	float MaxHealth = 250.0f;
 	float Health = MaxHealth;
+//<summary>
+//Applies Damage to the player
+//If health is below or equal to zero player dies
+//Point is granted to other player on death
+//</summary>
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)override;
 
 
@@ -73,7 +78,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") TSubclassOf<class ABaseWeapon> weaponBlueprint;
 	bool sprinting;
 	bool bShouldClimb;
-	bool IsDead = false;
 	FVector VaultPos;
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
