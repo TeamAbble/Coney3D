@@ -104,6 +104,6 @@ public:
 	UPROPERTY(Replicated);
 	bool Dead = false;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	ABaseWeapon* weapon;
 
 };

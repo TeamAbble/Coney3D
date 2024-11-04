@@ -29,7 +29,7 @@ void APlayerCharacter::BeginPlay()
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
 
-		ABaseWeapon* weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprint, spawnParams);
+		weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprint, spawnParams);
 		weapon->AttachToComponent(weaponPointRef, FAttachmentTransformRules::KeepRelativeTransform);
 		weapon->SetActorRelativeTransform(FTransform());
 
