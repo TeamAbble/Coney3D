@@ -23,6 +23,9 @@ void ABaseWeapon::BeginPlay()
 	canFire = true;
 	bReplicates = true;
 	currentAmmo = maxAmmo;
+	if (connectedPlayer && !connectedPlayer->weapon) {
+		connectedPlayer->weapon = this;
+	}
 }
 
 void ABaseWeapon::TryFire_Implementation()

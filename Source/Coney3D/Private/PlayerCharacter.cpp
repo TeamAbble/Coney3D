@@ -29,7 +29,7 @@ void APlayerCharacter::BeginPlay()
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
 
-		ABaseWeapon* weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprint, spawnParams);
+		weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprint, spawnParams);
 		weapon->AttachToComponent(weaponPointRef, FAttachmentTransformRules::KeepRelativeTransform);
 		weapon->SetActorRelativeTransform(FTransform());
 
@@ -46,20 +46,13 @@ void APlayerCharacter::BeginPlay()
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)
 {
-	Health -= DamageAmount;
-	if (Health <= 0) {
-		Die();
+	if (Health>0) {
+		Health -= DamageAmount;
+		if (Health <= 0) {
+			Die(DamageDealer);
+		}
+		
 	}
-	
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DamageAmount));
-	}
-	
-	AWeaponProjectile* proj = Cast<AWeaponProjectile>(DamageDealer);
-	if (proj) {
-		//We'll do something here maybe
-	}
-
 	return DamageAmount;
 }
 
@@ -164,8 +157,8 @@ void APlayerCharacter::Dash_Implementation(FVector forward, FVector right)
 		return;
 
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.Y));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.X));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(MovementVector.Y));
 
 	}
 	FVector Up = FVector(0, 0, DashUpwardVelocity);
@@ -199,11 +192,14 @@ bool APlayerCharacter::GetFireInput()
 	return fireInput;
 }
 
-void APlayerCharacter::Die()
+void APlayerCharacter::Die(AActor *OtherPlayer)
 {
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Dead");
-		Respawn();
+		SetActorHiddenInGame(true);
+		APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);
+		OtherP->GainPoint();
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &APlayerCharacter::Respawn, RespawnTime, false);
+		IsDead = true;
 	}
 }
 
@@ -211,6 +207,16 @@ void APlayerCharacter::Respawn()
 {
 	Health = MaxHealth;
 	SetActorLocation(SpawnLocation);
+	SetActorHiddenInGame(false);
+	IsDead = false;
+}
+
+void APlayerCharacter::GainPoint()
+{
+	points++;
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green,FString::FromInt(points));
+	}
 }
 
 
@@ -262,4 +268,12 @@ void APlayerCharacter::Vault()
 	else {
 		VaultPos = { 0,0,0 };
 	}
+
+
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APlayerCharacter, Dead);
 }

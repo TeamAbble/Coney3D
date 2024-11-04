@@ -29,11 +29,12 @@ protected:
 	FVector RightDir;
 	FVector2D MovementVector;
 	FRotator Rotation;
+	UPROPERTY(Replicated) int points = 0;
 	FRotator YawRotation;
 	FTimerHandle DashTimer;
+	FTimerHandle RespawnTimer;
 	bool CanDash = true;
 
-	bool Dead = false; 
 	
 	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
 	float MaxHealth = 250.0f;
@@ -61,6 +62,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float SprintSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashCooldown=2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health and Damage")float RespawnTime = 1;
 	
 
 	float currentTime;
@@ -71,6 +73,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons") TSubclassOf<class ABaseWeapon> weaponBlueprint;
 	bool sprinting;
 	bool bShouldClimb;
+	bool IsDead = false;
 	FVector VaultPos;
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
@@ -92,11 +95,15 @@ public:
 	void TryDash();
 	void ResetDash();
 	bool GetFireInput();
-	void Die();
+	void Die(AActor *OtherPlayer);
 	void Respawn();
+	void GainPoint();
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();
-	UPROPERTY(BlueprintReadWrite) bool paused;
+	UPROPERTY(Replicated);
+	bool Dead = false;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	ABaseWeapon* weapon;
 
 };
