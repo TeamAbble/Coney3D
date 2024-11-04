@@ -155,6 +155,16 @@ void ABaseWeapon::Tick(float DeltaTime)
 	accumulatedSpeadCurrent = FMath::Clamp(accumulatedSpeadCurrent - DeltaTime * accumulatedSpreadDecay, 0, maxAccumulatedSpreadAngle);
 }
 
+
+void ABaseWeapon::Hide()
+{
+	SetActorHiddenInGame(true);
+	bActive = false;
+}
+void ABaseWeapon::Show() {
+	SetActorHiddenInGame(false);
+	bActive = true;
+}
 void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ABaseWeapon, connectedPlayer);
