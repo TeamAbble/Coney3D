@@ -43,6 +43,15 @@ void APlayerCharacter::BeginPlay()
 		PlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
 	}
 }
+/// <summary>
+/// <para>Deals damage to this player subtracting from Health</para>
+/// <para>Checks if health is <=0, will call the Die() method if true</para>
+/// </summary>
+/// <param name="DamageAmount"></param>
+/// <param name="DamageEvent"></param>
+/// <param name="EventInstigator"></param>
+/// <param name="DamageDealer"></param>
+/// <returns></returns>
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)
 {
 	if (Health>0) {
@@ -90,6 +99,11 @@ void APlayerCharacter::SetSprint(const FInputActionValue& value) {
 	sprinting = value.Get<bool>();
 	Sprint(sprinting);
 }
+/// <summary>
+/// <para>Gets the movement vector from the Move Input Action and adds the value to the player's built in movement input</para>
+/// <para>Updates the direction to be used for dashing</para> 
+/// </summary>
+/// <param name="value"></param>
 void APlayerCharacter::Move(const FInputActionValue& value)
 {
 	MovementVector = value.Get<FVector2D>();
@@ -106,7 +120,10 @@ void APlayerCharacter::Move(const FInputActionValue& value)
 
 	}
 }
-
+/// <summary>
+/// Allows aiming with the mouse, so long as there is a controller present on this actor
+/// </summary>
+/// <param name="value"></param>
 void APlayerCharacter::Look(const FInputActionValue& value)
 {
 	FVector2D LookAxisVector = value.Get<FVector2D>();
@@ -174,13 +191,13 @@ void APlayerCharacter::Dash_Implementation(FVector forward, FVector right)
 	GetWorld()->GetTimerManager().SetTimer(DashTimer, this, &APlayerCharacter::ResetDash, DashCooldown, false);
 	
 }
-
+//Updates direction, then performs the dash
 void APlayerCharacter::TryDash()
 {
 	UpdateDirection();
 	Dash(ForwardDir * MovementVector.Y, RightDir * MovementVector.X);	
 }
-
+//Sets CanDash to true
 void APlayerCharacter::ResetDash()
 {
 	CanDash = true;
@@ -190,7 +207,12 @@ bool APlayerCharacter::GetFireInput()
 {
 	return fireInput&& !Dead;
 }
-
+/// <summary>
+/// <para>Sets the actor as invisible, adds a point to the other player</para>
+/// <para>Sets Dead to True</para>
+/// <para>Sets a cowntdown for respawn</para>
+/// </summary>
+/// <param name="OtherPlayer"></param>
 void APlayerCharacter::Die(AActor *OtherPlayer)
 {
 	if (GEngine) {
@@ -202,7 +224,12 @@ void APlayerCharacter::Die(AActor *OtherPlayer)
 		Dead = true;
 	}
 }
-
+/// <summary>
+/// <para>Resets the player's health</para>
+/// <para>sets the actor to visible</para>
+/// <para>shows the weapon</para>
+/// <para>sets the dead bool to false</para>
+/// </summary>
 void APlayerCharacter::Respawn()
 {
 	Health = MaxHealth;
@@ -212,6 +239,7 @@ void APlayerCharacter::Respawn()
 	Dead = false;
 }
 
+//adds 1 point to the player
 void APlayerCharacter::GainPoint()
 {
 	points++;
@@ -220,12 +248,17 @@ void APlayerCharacter::GainPoint()
 	}
 }
 
-
+//Returns Movement Vector
 FVector2D APlayerCharacter::GetMovementVector()
 {
 	return FVector2D(MovementVector);
 }
-
+/// <summary>
+/// <para>Draws 3 lines used to calculate the vault location</para>
+/// <para>First one checks if there is a wall within vaulting distance</para>
+/// second checks if the wall has a ledge to vault to
+/// The third checks the wall's normal, and decides whether the player can vault
+/// </summary>
 void APlayerCharacter::Vault()
 {
 	FHitResult Hit;
