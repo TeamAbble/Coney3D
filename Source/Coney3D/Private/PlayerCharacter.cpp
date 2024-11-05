@@ -43,7 +43,6 @@ void APlayerCharacter::BeginPlay()
 		PlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
 	}
 }
-
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)
 {
 	if (Health>0) {
@@ -189,7 +188,7 @@ void APlayerCharacter::ResetDash()
 
 bool APlayerCharacter::GetFireInput()
 {
-	return fireInput;
+	return fireInput&& !Dead;
 }
 
 void APlayerCharacter::Die(AActor *OtherPlayer)
@@ -199,7 +198,8 @@ void APlayerCharacter::Die(AActor *OtherPlayer)
 		APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);
 		OtherP->GainPoint();
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &APlayerCharacter::Respawn, RespawnTime, false);
-		IsDead = true;
+		weapon->Hide();
+		Dead = true;
 	}
 }
 
@@ -208,7 +208,8 @@ void APlayerCharacter::Respawn()
 	Health = MaxHealth;
 	SetActorLocation(SpawnLocation);
 	SetActorHiddenInGame(false);
-	IsDead = false;
+	weapon->Show();
+	Dead = false;
 }
 
 void APlayerCharacter::GainPoint()
