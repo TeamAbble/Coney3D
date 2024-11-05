@@ -29,7 +29,7 @@ protected:
 	FVector RightDir;
 	FVector2D MovementVector;
 	FRotator Rotation;
-	UPROPERTY(Replicated) int points = 0;
+	int points = 0;
 	FRotator YawRotation;
 	FTimerHandle DashTimer;
 	FTimerHandle RespawnTimer;
@@ -38,7 +38,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
 	float MaxHealth = 250.0f;
-	UPROPERTY(Replicated)
 	float Health = MaxHealth;
 //<summary>
 //Applies Damage to the player
@@ -82,20 +81,14 @@ public:
 	FVector VaultPos;
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
-	UFUNCTION(Server, Unreliable)
-	void UpdateAimRefPosition_Server(FQuat rotation);
-	UFUNCTION(Client, Unreliable)
-	void UpdateAimRefPosition_Client(FQuat rotation);
 	UFUNCTION()
 	void SetFire(const FInputActionValue& value);
 	UFUNCTION()
 	void SetSprint(const FInputActionValue& value);
 	UFUNCTION()
 	void Jumping();
-	UFUNCTION(Server, Unreliable)
 	void Sprint(bool sprint);
 	void UpdateDirection();
-	UFUNCTION(Server, Reliable)
 	void Dash(FVector forward, FVector right);
 	void TryDash();
 	void ResetDash();
@@ -106,9 +99,7 @@ public:
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();
-	UPROPERTY(Replicated)
 	bool Dead = false;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	ABaseWeapon* weapon;
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentHealth() const;

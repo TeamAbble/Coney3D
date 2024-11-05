@@ -53,5 +53,5 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
-	AActor* GetActorOwner();
+	AActor* GetActorOwner() const;
 };

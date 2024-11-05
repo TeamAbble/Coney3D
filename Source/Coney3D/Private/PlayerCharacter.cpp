@@ -23,8 +23,8 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	SpawnLocation = GetActorLocation();
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	if (GetLocalRole() == ROLE_Authority && weaponBlueprint) {
 
+	if (weaponBlueprint) {
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
@@ -59,7 +59,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		if (Health <= 0) {
 			Die(DamageDealer);
 		}
-		
 	}
 	return DamageAmount;
 }
@@ -136,26 +135,12 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 	}
 }
 
-void APlayerCharacter::UpdateAimRefPosition_Server_Implementation(FQuat rotation)
-{
-	if (aimRef) {
-		aimRef->SetWorldRotation(rotation);
-		UpdateAimRefPosition_Client(rotation);
-	}
-}
-void APlayerCharacter::UpdateAimRefPosition_Client_Implementation(FQuat rotation)
-{
-	if (aimRef && GetRemoteRole() != ENetRole::ROLE_Authority) 
-	{
-		aimRef->SetWorldRotation(rotation);
-	}
-}
 void APlayerCharacter::Jumping()
 {
 	Jump();
 }
 
-void APlayerCharacter::Sprint_Implementation(bool sprint)
+void APlayerCharacter::Sprint(bool sprint)
 {
 	sprinting = sprint;
 	GetCharacterMovement()->MaxWalkSpeed = sprinting ? SprintSpeed : WalkSpeed;
@@ -167,7 +152,7 @@ void APlayerCharacter::UpdateDirection()
 	RightDir = GetActorRightVector();
 }
 
-void APlayerCharacter::Dash_Implementation(FVector forward, FVector right)
+void APlayerCharacter::Dash(FVector forward, FVector right)
 {
 	if (!CanDash)
 		return;
@@ -304,13 +289,6 @@ void APlayerCharacter::Vault()
 	}
 
 
-}
-
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(APlayerCharacter, Dead);
-	DOREPLIFETIME(APlayerCharacter, Health);
 }
 
 float APlayerCharacter::GetMaxHealth() const

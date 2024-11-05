@@ -19,7 +19,7 @@ void AWeaponProjectile::BeginPlay()
 	Super::BeginPlay();
 	distanceTravelled = 0;
 	collider = GetComponentByClass<USphereComponent>();
-	if (GIsServer) {
+	if (collider) {
 		collider->OnComponentHit.AddDynamic(this, &AWeaponProjectile::OnHit);
 		collider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponProjectile::BeginOverlap);
 		collider->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
@@ -47,7 +47,7 @@ void AWeaponProjectile::Tick(float DeltaTime)
 
 void AWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!GIsServer || !movement || !ActorOwner)
+	if (!ActorOwner)
 		return;
 	DealDamage(HitComponent, OtherActor, OtherComponent, Hit);
 	if (GEngine) {
@@ -94,12 +94,12 @@ void AWeaponProjectile::Explode()
 
 void AWeaponProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!GIsServer || !movement || !ActorOwner)
+	if (!ActorOwner)
 		return;
 	DealDamage(OverlappedComponent, OtherActor, OtherComp, SweepResult);
 }
 
-AActor* AWeaponProjectile::GetActorOwner()
+AActor* AWeaponProjectile::GetActorOwner() const
 {
 	return ActorOwner;
 }
