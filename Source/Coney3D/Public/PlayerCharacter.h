@@ -38,6 +38,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Health And Damage") 
 	float MaxHealth = 250.0f;
+	UPROPERTY(Replicated)
 	float Health = MaxHealth;
 //<summary>
 //Applies Damage to the player
@@ -105,9 +106,12 @@ public:
 	FVector2D GetMovementVector();
 	UFUNCTION()
 	void Vault();
-	UPROPERTY(Replicated);
+	UPROPERTY(Replicated)
 	bool Dead = false;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	ABaseWeapon* weapon;
-
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentHealth() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMaxHealth() const;
 };

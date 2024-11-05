@@ -310,4 +310,15 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APlayerCharacter, Dead);
+	DOREPLIFETIME(APlayerCharacter, Health);
+}
+
+float APlayerCharacter::GetMaxHealth() const
+{
+	return MaxHealth;
+}
+
+float APlayerCharacter::GetCurrentHealth() const
+{
+	return Health;
 }
