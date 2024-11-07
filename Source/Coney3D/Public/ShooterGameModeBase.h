@@ -14,4 +14,6 @@ class CONEY3D_API AShooterGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+	void BeginPlay();
+
 };
