@@ -42,6 +42,12 @@ void APlayerCharacter::BeginPlay()
 		PlayerController->PlayerCameraManager->ViewPitchMax = 80.f;
 		PlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
 	}
+
+	//We have initialised this player, lets create another player
+	UWorld* World = GetWorld();
+	FString playerCreateError = "Players not found";
+	UGameInstance* gameInstance = World->GetGameInstance();
+	ULocalPlayer* newLocalPlayer = gameInstance->CreateLocalPlayer(1, playerCreateError, true);
 }
 /// <summary>
 /// <para>Deals damage to this player subtracting from Health</para>

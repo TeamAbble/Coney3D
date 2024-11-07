@@ -8,7 +8,8 @@ public class Coney3D : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","EnhancedInput", "Niagara" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","EnhancedInput", "Niagara","InputCore",
+			"HeadMountedDisplay", "ApplicationCore", "Slate", "SlateCore", "EngineSettings" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
