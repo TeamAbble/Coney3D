@@ -24,13 +24,7 @@ void AWeaponProjectile::BeginPlay()
 		collider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponProjectile::BeginOverlap);
 		collider->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
 	}
-	movement = GetComponentByClass<UProjectileMovementComponent>();
-	if (movement) {
-		if (!GIsServer) {
-			movement->ProjectileGravityScale = 0;
-		}
-	}
-	
+	movement = GetComponentByClass<UProjectileMovementComponent>();	
 }
 
 // Called every frame

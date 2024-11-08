@@ -21,14 +21,13 @@ void ABaseWeapon::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Set Time Between rounds on " + GetName() + " to " + FString::SanitizeFloat(timeBetweenShots));
 	}
 	canFire = true;
-	bReplicates = true;
 	currentAmmo = maxAmmo;
 	if (connectedPlayer && !connectedPlayer->weapon) {
 		connectedPlayer->weapon = this;
 	}
 }
 
-void ABaseWeapon::TryFire_Implementation()
+void ABaseWeapon::TryFire()
 {
 	if (GEngine) {
 		//Lol
@@ -154,8 +153,6 @@ void ABaseWeapon::Tick(float DeltaTime)
 
 	accumulatedSpeadCurrent = FMath::Clamp(accumulatedSpeadCurrent - DeltaTime * accumulatedSpreadDecay, 0, maxAccumulatedSpreadAngle);
 }
-
-
 void ABaseWeapon::Hide()
 {
 	SetActorHiddenInGame(true);
@@ -165,8 +162,8 @@ void ABaseWeapon::Show() {
 	SetActorHiddenInGame(false);
 	bActive = true;
 }
-void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ABaseWeapon, connectedPlayer);
+
+void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
 }
 

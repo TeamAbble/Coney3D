@@ -121,6 +121,8 @@ void APlayerCharacter::Move(const FInputActionValue& value)
 /// <param name="value"></param>
 void APlayerCharacter::Look(const FInputActionValue& value)
 {
+	if (GamePaused)
+		return;
 	FVector2D LookAxisVector = value.Get<FVector2D>();
 	if (Controller != nullptr) {
 		AddControllerYawInput(LookAxisVector.X);
@@ -133,7 +135,8 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 
 void APlayerCharacter::Jumping()
 {
-	Jump();
+	if(!GamePaused)
+		Jump();
 }
 
 void APlayerCharacter::Sprint(bool sprint)
@@ -175,8 +178,10 @@ void APlayerCharacter::Dash(FVector forward, FVector right)
 //Updates direction, then performs the dash
 void APlayerCharacter::TryDash()
 {
-	UpdateDirection();
-	Dash(ForwardDir * MovementVector.Y, RightDir * MovementVector.X);	
+	if (!GamePaused) {
+		UpdateDirection();
+		Dash(ForwardDir * MovementVector.Y, RightDir * MovementVector.X);
+	}
 }
 //Sets CanDash to true
 void APlayerCharacter::ResetDash()
@@ -184,9 +189,9 @@ void APlayerCharacter::ResetDash()
 	CanDash = true;
 }
 
-bool APlayerCharacter::GetFireInput()
+bool APlayerCharacter::GetFireInput() const
 {
-	return fireInput&& !Dead;
+	return fireInput && !Dead && !GamePaused;
 }
 /// <summary>
 /// <para>Sets the actor as invisible, adds a point to the other player</para>
@@ -230,7 +235,7 @@ void APlayerCharacter::GainPoint()
 }
 
 //Returns Movement Vector
-FVector2D APlayerCharacter::GetMovementVector()
+FVector2D APlayerCharacter::GetMovementVector() const
 {
 	return FVector2D(MovementVector);
 }
