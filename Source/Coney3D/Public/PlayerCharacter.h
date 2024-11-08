@@ -12,7 +12,6 @@
 
 class ABaseWeapon;
 
-
 UCLASS()
 class CONEY3D_API APlayerCharacter : public ACharacter
 {
