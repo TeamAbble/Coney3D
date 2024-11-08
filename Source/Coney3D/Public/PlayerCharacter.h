@@ -49,7 +49,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	static bool GamePaused;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputMappingContext* DefaultMappingContext;
@@ -91,11 +91,11 @@ public:
 	void Dash(FVector forward, FVector right);
 	void TryDash();
 	void ResetDash();
-	bool GetFireInput();
+	bool GetFireInput() const;
 	void Die(AActor *OtherPlayer);
 	void Respawn();
 	void GainPoint();
-	FVector2D GetMovementVector();
+	FVector2D GetMovementVector() const;
 	UFUNCTION()
 	void Vault();
 	bool Dead = false;

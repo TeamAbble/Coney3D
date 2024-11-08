@@ -19,13 +19,6 @@ class CONEY3D_API ABaseWeapon : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeapon();
-	
-	struct RaycastTracer {
-		AActor* tracerActor = nullptr;
-		FVector start = FVector(), end = FVector();
-		float lerpIncrement = 0, life = 0;
-	};
-
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,7 +30,7 @@ public:
 	/// <summary>
 	/// performs a line trace with some mildly annoying maths to shoot a target
 	/// </summary>
-	UFUNCTION(Server, Reliable) void TryFire();
+	void TryFire();
 	/// <summary>
 	/// Uses information from the linetrace performed by TryFire() to spawn and set up a tracer.
 	/// </summary>
@@ -113,8 +106,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float projectileSpeed = 500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Visuals") float tracerDeleteTime = 2.f;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	bool bActive;
 	void Hide();
 	void Show();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
