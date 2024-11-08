@@ -17,7 +17,6 @@ void ABaseWeapon::BeginPlay()
 	Super::BeginPlay();
 	timeBetweenShots = 1 / (shotsPerMinute / 60);
 	if (GEngine) {
-		//Lol
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Set Time Between rounds on " + GetName() + " to " + FString::SanitizeFloat(timeBetweenShots));
 	}
 	canFire = true;
@@ -29,8 +28,13 @@ void ABaseWeapon::BeginPlay()
 
 void ABaseWeapon::TryFire()
 {
-	if (GEngine) {
-		//Lol
+
+	if (!projectileBlueprint || !muzzlePoint)
+	{
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Failed to fire! Components were missing!: " + GetActorNameOrLabel());
+		}
+		return;
 	}
 
 	//lets shoot shit
@@ -107,15 +111,13 @@ void ABaseWeapon::Tick(float DeltaTime)
 		if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(-1, 0.05f, FColor::Red, "ERROR! NO PLAYER CHARACTER OWNS WEAPON: " + GetName());
 		}
+		return;
 	}
 	if (fireMode == none) {
 		if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(-1, 0.05f, FColor::Red, "FIREMODE IS SET TO NONE ON WEAPON: " + GetName());
 		}
-	}
-	else {
-		if(connectedPlayer)
-			fireInput = connectedPlayer->GetFireInput();
+		return;
 	}
 	
 

@@ -11,19 +11,14 @@ void AShooterGameModeBase::BeginPlay()
 	FString error = "Players not found!";
 	//Create local multiplayer mode
 	ULocalPlayer* LocalPlayer = World->GetGameInstance()->CreateLocalPlayer(1, error, true);
-	GetWorld()->GetTimerManager().SetTimer(RoundTimer, this, AShooterGameModeBase::EndMatch, RoundTimeInSeconds, false);
+	GetWorld()->GetTimerManager().SetTimer(RoundTimer, this, &AShooterGameModeBase::EndMatch, RoundTimeInSeconds, false);
 }
 
 FString AShooterGameModeBase::MinutesSeconds(float seconds)
 {
-	float Minutes;
+	int Minutes = FMath::FloorToInt(RoundTimeInSeconds / 60);
 	float Seconds = RoundTimeInSeconds;
-	while (RoundTimeInSeconds > 60) {
-		seconds -= 60;
-		Minutes++;
-	}
-
-	return FString(FString::SanitizeFloat(Minutes)+ FString(":")+FString::SanitizeFloat(Seconds));
+	return FString(FString::FromInt(Minutes)+ FString(":")+FString::SanitizeFloat(Seconds));
 }
 
 void AShooterGameModeBase::EndMatch()

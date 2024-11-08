@@ -28,12 +28,25 @@ void APlayerCharacter::BeginPlay()
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
+		if (weaponBlueprints.Num() > 0) {
+			for (size_t i = 0; i < weaponBlueprints.Num(); i++)
+			{
+				if (!weaponBlueprints[i])
+					continue;
 
-		weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprint, spawnParams);
-		weapon->AttachToComponent(weaponPointRef, FAttachmentTransformRules::KeepRelativeTransform);
-		weapon->SetActorRelativeTransform(FTransform());
+				ABaseWeapon* _weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprints[i], spawnParams);
+				_weapon->AttachToComponent(weaponPointRef, FAttachmentTransformRules::KeepRelativeTransform);
+				_weapon->SetActorRelativeTransform(FTransform());
 
-		weapon->connectedPlayer = this;
+				_weapon->connectedPlayer = this;
+				_weapon->Hide();
+				weapons.Add(_weapon);
+			}
+		}
+		if (weapons[0]) {
+			weapon = weapons[0];
+			weapon->Show();
+		}
 	}
 }
 /// <summary>
@@ -73,6 +86,10 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (weapon) {
+		weapon->fireInput = GetFireInput();
+	}
 }
 
 // Called to bind functionality to input
@@ -90,12 +107,39 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Registers the fire callback for both started and completed
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SetFire);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &APlayerCharacter::SetFire);
+
+		EnhancedInputComponent->BindAction(WeaponCycleAction, ETriggerEvent::Triggered, this, &APlayerCharacter::CycleWeapons);
 	}
 
 }
 
 void APlayerCharacter::SetFire(const FInputActionValue& value) {
 	fireInput = value.Get<bool>();
+}
+void APlayerCharacter::CycleWeapons(const FInputActionValue& value)
+{
+	float val = value.Get<float>();
+	int newVal = FMath::RoundToInt(val);
+	weaponIndex = (weaponIndex + newVal) % weapons.Num();
+	if (weaponIndex < 0)
+		weaponIndex = weapons.Num() - 1;
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Cycling weapon - In value: " + FString::SanitizeFloat(val) + " Cycle Value: " + FString::FromInt(newVal)));
+	}
+	for (size_t i = 0; i < weapons.Num(); i++)
+	{
+		if (!weapons[i])
+			continue;
+
+		weapons[i]->fireInput = false;
+		if (i == weaponIndex) {
+			weapons[i]->Show();
+			weapon = weapons[i];
+		}
+		else {
+			weapons[i]->Hide();
+		}
+	}
 }
 void APlayerCharacter::SetSprint(const FInputActionValue& value) {
 	Sprint(!sprinting);
@@ -213,6 +257,7 @@ void APlayerCharacter::Die(AActor *OtherPlayer)
 		OtherP->GainPoint();
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &APlayerCharacter::Respawn, RespawnTime, false);
 		weapon->Hide();
+		
 		Dead = true;
 	}
 }

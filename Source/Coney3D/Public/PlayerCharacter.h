@@ -59,6 +59,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* SprintAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* DashAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* FireAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputAction* WeaponCycleAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health and Damage") FVector SpawnLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashUpwardVelocity;
@@ -83,6 +85,9 @@ public:
 	UFUNCTION()
 	void SetFire(const FInputActionValue& value);
 	UFUNCTION()
+	void CycleWeapons(const FInputActionValue& value);
+
+	UFUNCTION()
 	void SetSprint(const FInputActionValue& value);
 	UFUNCTION()
 	void Jumping();
@@ -104,4 +109,9 @@ public:
 	float GetCurrentHealth() const;
 	UFUNCTION(BlueprintCallable)
 	float GetMaxHealth() const;
+
+	UPROPERTY(BlueprintReadOnly) TArray<ABaseWeapon*> weapons;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<TSubclassOf<ABaseWeapon>> weaponBlueprints;
+
+	int8 weaponIndex;
 };
