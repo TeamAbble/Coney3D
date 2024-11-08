@@ -67,8 +67,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	aimRef->SetWorldRotation(GetBaseAimRotation());
 }
 
 // Called to bind functionality to input
@@ -83,7 +81,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APlayerCharacter::TryDash);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &APlayerCharacter::SetSprint);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::SetSprint);
 		//Registers the fire callback for both started and completed
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SetFire);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &APlayerCharacter::SetFire);
@@ -95,8 +92,7 @@ void APlayerCharacter::SetFire(const FInputActionValue& value) {
 	fireInput = value.Get<bool>();
 }
 void APlayerCharacter::SetSprint(const FInputActionValue& value) {
-	sprinting = value.Get<bool>();
-	Sprint(sprinting);
+	Sprint(!sprinting);
 }
 /// <summary>
 /// <para>Gets the movement vector from the Move Input Action and adds the value to the player's built in movement input</para>
