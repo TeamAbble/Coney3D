@@ -14,6 +14,16 @@ class CONEY3D_API AShooterGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-	void BeginPlay();
+
+public:
+protected: 
+	virtual void BeginPlay() override;
+
+public: 
+	FTimerHandle RoundTimer;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) float RoundTimeInSeconds;
+	FString MinutesSeconds(float seconds);
+	void EndMatch();
+	
 
 };
