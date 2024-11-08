@@ -44,12 +44,12 @@ protected:
 //Point is granted to other player on death
 //</summary>
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageDealer)override;
-
+	virtual void PossessedBy(AController* NewController) override;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	static bool GamePaused;
+	UPROPERTY(BlueprintReadWrite) bool GamePaused;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") class UInputMappingContext* DefaultMappingContext;

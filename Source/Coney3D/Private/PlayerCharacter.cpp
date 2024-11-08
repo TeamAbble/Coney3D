@@ -35,13 +35,6 @@ void APlayerCharacter::BeginPlay()
 
 		weapon->connectedPlayer = this;
 	}
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-		PlayerController->PlayerCameraManager->ViewPitchMax = 80.f;
-		PlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
-	}
 }
 /// <summary>
 /// <para>Deals damage to this player subtracting from Health</para>
@@ -61,6 +54,19 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		}
 	}
 	return DamageAmount;
+}
+
+void APlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+		PlayerController->PlayerCameraManager->ViewPitchMax = 80.f;
+		PlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
+	}
 }
 
 // Called every frame
