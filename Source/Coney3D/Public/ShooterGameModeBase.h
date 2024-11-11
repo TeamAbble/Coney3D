@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "PlayerCharacter.h"
 #include "ShooterGameModeBase.generated.h"
 
 /**
@@ -21,7 +22,7 @@ protected:
 
 public: 
 	FTimerHandle RoundTimer;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) float RoundTimeInSeconds;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) float RoundTimeInSeconds = 500;
 	FString MinutesSeconds(float seconds);
 	void EndMatch();
 	

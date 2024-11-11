@@ -25,6 +25,17 @@ void AShooterGameModeBase::EndMatch()
 {
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "Match Ended");
+		int CurrentWinnerIndex=-1;
+		int CurrentBestScore=-1;
+		TArray<ULocalPlayer*> LocalPlayers = GetGameInstance()->GetLocalPlayers();
+		for (int i = 0; i < sizeof(LocalPlayers); i++) {
+			APlayerCharacter* Player = Cast<APlayerCharacter>(LocalPlayers[i]);
+			//if (CurrentBestScore<Player->) {
+
+			//}
+
+		}
+		
 	}
 }
 
