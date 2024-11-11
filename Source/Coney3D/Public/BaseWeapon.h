@@ -112,6 +112,6 @@ public:
 	bool firePressed;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float aimSpeed = 5;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float aimFOV = 60;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Aiming") float aimSpeed = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Aiming") float aimFOV = 60;
 };
