@@ -89,6 +89,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (weapon) {
 		weapon->fireInput = GetFireInput();
+
+		if (firstPersonCamera && thirdPersonCamera) {
+			aimLerpProgress += (aimed ? DeltaTime : -DeltaTime) * weapon->aimSpeed;
+			aimLerpProgress = FMath::Clamp(aimLerpProgress, 0, 1);
+			if (firstPerson) {
+				firstPersonCamera->FieldOfView = FMath::Lerp(70, weapon->aimFOV, aimLerpProgress);
+			}
+			else {
+				thirdPersonCamera->FieldOfView = FMath::Lerp(70, weapon->aimFOV, aimLerpProgress);
+			}
+		}
 	}
 }
 
@@ -107,12 +118,38 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Registers the fire callback for both started and completed
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SetFire);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &APlayerCharacter::SetFire);
-
 		EnhancedInputComponent->BindAction(WeaponCycleAction, ETriggerEvent::Triggered, this, &APlayerCharacter::CycleWeapons);
+
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &APlayerCharacter::TryAim);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APlayerCharacter::TryAim);
+
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &APlayerCharacter::TryAim);
+
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SwitchView);
 	}
 
 }
+void APlayerCharacter::TryAim(const FInputActionValue& value) {
+	if (!firstPersonCamera || !thirdPersonCamera)
+		return;
+	aimed = value.Get<bool>();
+}
+void APlayerCharacter::SwitchView(const FInputActionValue& value)
+{
+	if (!firstPersonCamera || !thirdPersonCamera) {
+		return;
+	}
 
+	firstPerson = !firstPerson;
+	if (firstPerson) {
+		firstPersonCamera->Activate();
+		thirdPersonCamera->Deactivate();
+	}
+	else {
+		firstPersonCamera->Deactivate();
+		thirdPersonCamera->Activate();
+	}
+}
 void APlayerCharacter::SetFire(const FInputActionValue& value) {
 	fireInput = value.Get<bool>();
 }
@@ -346,6 +383,11 @@ void APlayerCharacter::Vault()
 float APlayerCharacter::GetMaxHealth() const
 {
 	return MaxHealth;
+}
+
+int APlayerCharacter::GetScore() const
+{
+	return points;
 }
 
 float APlayerCharacter::GetCurrentHealth() const

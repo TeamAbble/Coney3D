@@ -44,7 +44,7 @@ void ABaseWeapon::TryFire()
 		FHitResult hit;
 		//Then set the start and end points
 		FVector traceStart = connectedPlayer->playerCam->GetComponentLocation();
-		FVector traceEnd = connectedPlayer->playerCam->GetComponentLocation() + (FMath::VRandCone(connectedPlayer->playerCam->GetForwardVector(), 
+		FVector traceEnd = muzzlePoint->GetComponentLocation() + (FMath::VRandCone(connectedPlayer->playerCam->GetForwardVector(),
 			FMath::DegreesToRadians(accumulatedSpeadCurrent + hipFireSpreadAngle))) * maxRange;
 
 		//Then create query parameters, so we can ignore the player and the weapon
@@ -106,7 +106,6 @@ void ABaseWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	//Now we can process the tracers
 	canFire = !fireBlocked;
-	bool firePressed = false;
 	if (!connectedPlayer) {
 		if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(-1, 0.05f, FColor::Red, "ERROR! NO PLAYER CHARACTER OWNS WEAPON: " + GetName());
@@ -132,16 +131,22 @@ void ABaseWeapon::Tick(float DeltaTime)
 			}
 		}
 
-		if (!fired && fireInput && (chargeTime == 0 || currentCharge >= chargeTime) && (firePressed || fireMode != single)) {
-			if (muzzleFlashInstance) {
-				muzzleFlashInstance->Activate(true);
-			}
-			fired = true;
-			TryFire();
-			firePressed = true;
-			GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots, false);
+		if (fireInput) {
 
+		if (!fired && (chargeTime == 0 || currentCharge >= chargeTime) && (!firePressed || fireMode != single)) {
+				if (muzzleFlashInstance) {
+					muzzleFlashInstance->Activate(true);
+				}
+				fired = true;
+				TryFire();
+				firePressed = true;
+				GetWorld()->GetTimerManager().SetTimer(resetFireTimerHandle, this, &ABaseWeapon::ResetFired, timeBetweenShots, false);
+			}
 		}
+		else {
+			firePressed = false;
+		}
+		
 	}
 	else {
 		currentCharge = FMath::Min(currentCharge - chargeDecay, 0);
