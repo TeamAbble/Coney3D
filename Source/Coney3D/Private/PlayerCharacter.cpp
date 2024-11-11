@@ -14,7 +14,6 @@ APlayerCharacter::APlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -22,7 +21,14 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnLocation = GetActorLocation();
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (GetCharacterMovement()) {
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	}
+	else {
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Could not get CharacterMovement component!");
+		}
+	}
 
 	if (weaponBlueprint) {
 		FActorSpawnParameters spawnParams;
@@ -94,10 +100,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 			aimLerpProgress += (aimed ? DeltaTime : -DeltaTime) * weapon->aimSpeed;
 			aimLerpProgress = FMath::Clamp(aimLerpProgress, 0, 1);
 			if (firstPerson) {
-				firstPersonCamera->FieldOfView = FMath::Lerp(70, weapon->aimFOV, aimLerpProgress);
+				firstPersonCamera->FieldOfView = FMath::Lerp(startFOV, weapon->aimFOV, aimLerpProgress);
 			}
 			else {
-				thirdPersonCamera->FieldOfView = FMath::Lerp(70, weapon->aimFOV, aimLerpProgress);
+				thirdPersonCamera->FieldOfView = FMath::Lerp(startFOV, weapon->aimFOV, aimLerpProgress);
 			}
 		}
 	}
@@ -123,9 +129,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &APlayerCharacter::TryAim);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APlayerCharacter::TryAim);
 
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &APlayerCharacter::TryAim);
-
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SwitchView);
+		EnhancedInputComponent->BindAction(ViewSwitchAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SwitchView);
 	}
 
 }
@@ -180,6 +184,7 @@ void APlayerCharacter::CycleWeapons(const FInputActionValue& value)
 }
 void APlayerCharacter::SetSprint(const FInputActionValue& value) {
 	Sprint(!sprinting);
+
 }
 /// <summary>
 /// <para>Gets the movement vector from the Move Input Action and adds the value to the player's built in movement input</para>

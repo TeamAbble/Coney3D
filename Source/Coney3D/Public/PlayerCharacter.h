@@ -128,5 +128,7 @@ public:
 	bool firstPerson;
 	bool aimed;
 	float aimLerpProgress;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float startFOV;
 };
 
