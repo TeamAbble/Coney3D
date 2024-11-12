@@ -41,9 +41,7 @@ void AShooterGameModeBase::EndMatch()
 				
 		}
 	}
-	if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString("Player ") + FString::FromInt(CurrentWinnerIndex + 1) + FString(" wins with ") + FString::FromInt(CurrentBestScore) + FString(" points"));
-		}
+	WinnerText = FString("Player ") + FString::FromInt(CurrentWinnerIndex + 1) + FString(" wins with ") + FString::FromInt(CurrentBestScore) + FString(" points");
 		
 
 }

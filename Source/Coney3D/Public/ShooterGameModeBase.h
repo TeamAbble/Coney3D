@@ -23,6 +23,7 @@ protected:
 public: 
 	FTimerHandle RoundTimer;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) float RoundTimeInSeconds = 500;
+	UPROPERTY(BlueprintReadOnly)FString WinnerText;
 	FString MinutesSeconds(float seconds);
 	void EndMatch();
 	
