@@ -193,6 +193,7 @@ void APlayerCharacter::SetSprint(const FInputActionValue& value) {
 /// <param name="value"></param>
 void APlayerCharacter::Move(const FInputActionValue& value)
 {
+	if (GamePaused || Dead) return; 
 	MovementVector = value.Get<FVector2D>();
 
 	if (Controller != nullptr) {
@@ -213,7 +214,7 @@ void APlayerCharacter::Move(const FInputActionValue& value)
 /// <param name="value"></param>
 void APlayerCharacter::Look(const FInputActionValue& value)
 {
-	if (GamePaused)
+	if (GamePaused||Dead)
 		return;
 	FVector2D LookAxisVector = value.Get<FVector2D>();
 	if (Controller != nullptr) {
@@ -294,6 +295,7 @@ bool APlayerCharacter::GetFireInput() const
 void APlayerCharacter::Die(AActor *OtherPlayer)
 {
 	if (GEngine) {
+		AddMovementInput(FVector(0, 0, 0));
 		SetActorHiddenInGame(true);
 		APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);
 		OtherP->GainPoint();
