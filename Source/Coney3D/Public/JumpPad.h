@@ -23,4 +23,21 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	UPROPERTY(EditDefaultOnly)
+		class UStaticMeshComponent* JumpPadMesh;
+
+	UPROPERTY(EditDefaultsOnly)
+		class UMaterialInterface* InactiveMaterial;
+
+	UPROPOERTY(EditDefaultsOnly)
+		class UMaterialInterface* ActiveMaterial;
+
+	UFUNCTION()
+	void JumpPadTriggered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void JumpPadEndTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
 };
