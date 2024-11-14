@@ -20,7 +20,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	class UBoxComponent* JumpPadTriggerVolume;
-
+	UPROPERTY(EditAnywhere)
+	class UArrowComponent* jumpPadDirection;
+	UPROPERTY(EditAnywhere)
+	float launchForce;
+	UPROPERTY(EditAnywhere)
+	bool setVelocityInsteadOfForce;
 
 public:	
 	// Called every frame
@@ -41,5 +46,8 @@ private:
 
 	UFUNCTION()
 	void JumpPadEndTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
+
 
 };

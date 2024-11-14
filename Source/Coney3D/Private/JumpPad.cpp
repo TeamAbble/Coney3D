@@ -5,6 +5,7 @@
 #include "PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -53,13 +54,25 @@ void AJumpPad::JumpPadTriggered(UPrimitiveComponent* OverlappedComponent, AActor
 		}
 	}*/
 	//What about if, instead, we did this?
+	FVector force = jumpPadDirection->GetForwardVector() * launchForce;
 	if (OtherComp->IsSimulatingPhysics()) {
-
+		if (setVelocityInsteadOfForce) {
+			OtherComp->SetPhysicsLinearVelocity(force);
+		}
+		else {
+			OtherComp->AddForce(force);
+		}
 		return;
 	}
 	UCharacterMovementComponent* character = Cast<UCharacterMovementComponent>(OtherComp);
 	if (character) {
-		
+		if (setVelocityInsteadOfForce) {
+			character->Velocity = force;
+		}
+		else
+		{
+			character->Launch(force);
+		}
 	}
 }
 

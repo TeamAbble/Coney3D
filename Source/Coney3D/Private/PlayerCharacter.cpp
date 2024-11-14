@@ -137,6 +137,8 @@ void APlayerCharacter::TryAim(const FInputActionValue& value) {
 	if (!firstPersonCamera || !thirdPersonCamera)
 		return;
 	aimed = value.Get<bool>();
+	if (aimed)
+		SetSprint(false);
 }
 void APlayerCharacter::SwitchView(const FInputActionValue& value)
 {
@@ -183,7 +185,8 @@ void APlayerCharacter::CycleWeapons(const FInputActionValue& value)
 	}
 }
 void APlayerCharacter::SetSprint(const FInputActionValue& value) {
-	Sprint(!sprinting);
+
+	Sprint(!sprinting && !aimed);
 
 }
 /// <summary>
@@ -204,8 +207,10 @@ void APlayerCharacter::Move(const FInputActionValue& value)
 
 		AddMovementInput(ForwardDir, MovementVector.Y);
 		AddMovementInput(RightDir, MovementVector.X);
-
-
+		
+		if (MovementVector.Y <= 0) {
+			SetSprint(false);
+		}
 	}
 }
 /// <summary>
