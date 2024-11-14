@@ -235,7 +235,7 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 
 void APlayerCharacter::Jumping()
 {
-	if(!GamePaused)
+	if(!GamePaused && !Dead)
 		Jump();
 }
 
@@ -253,7 +253,7 @@ void APlayerCharacter::UpdateDirection()
 
 void APlayerCharacter::Dash(FVector forward, FVector right)
 {
-	if (!CanDash)
+	if (!CanDash || GamePaused || Dead)
 		return;
 
 	if (GEngine) {
