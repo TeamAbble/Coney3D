@@ -67,7 +67,7 @@ void AWeaponProjectile::DealDamage(UPrimitiveComponent* HitComponent, AActor* Ot
 						TArray<AActor*,FDefaultAllocator>(), ActorOwner);
 				}
 				else {
-					float damageDealt = FMath::Lerp(maxDamage, minDamage, UKismetMathLibrary::NormalizeToRange(distanceTravelled, minRange, maxRange));
+					float damageDealt = FMath::Lerp(maxDamage, minDamage, FMath::Clamp(UKismetMathLibrary::NormalizeToRange(distanceTravelled, minRange, maxRange), 0, 1));
 					UGameplayStatics::ApplyDamage(OtherActor, damageDealt, GetInstigatorController(), ActorOwner, damageType);
 				}
 			}

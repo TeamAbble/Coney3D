@@ -6,8 +6,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "BaseWeapon.h"
-#include "Net/UnrealNetwork.h"
-
+#include "Kismet/GameplayStatics.h"
+#include "ShooterGameModeBase.h"
+#include "GameFramework/PlayerStart.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -155,6 +156,7 @@ void APlayerCharacter::SwitchView(const FInputActionValue& value)
 		firstPersonCamera->Deactivate();
 		thirdPersonCamera->Activate();
 	}
+	playerCam = firstPerson ? firstPersonCamera : thirdPersonCamera;
 }
 void APlayerCharacter::SetFire(const FInputActionValue& value) {
 	fireInput = value.Get<bool>();
@@ -319,7 +321,12 @@ void APlayerCharacter::Die(AActor *OtherPlayer)
 void APlayerCharacter::Respawn()
 {
 	Health = MaxHealth;
-	SetActorLocation(SpawnLocation);
+	FVector spawnPos;
+	AShooterGameModeBase* mode = Cast<AShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (mode) {
+		spawnPos = mode->ChoosePlayerStart(GetController())->GetActorLocation();
+	}
+	SetActorLocation(spawnPos);
 	SetActorHiddenInGame(false);
 	weapon->Show();
 	Dead = false;
