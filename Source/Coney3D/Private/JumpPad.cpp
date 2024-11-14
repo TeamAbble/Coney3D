@@ -3,7 +3,7 @@
 
 #include "JumpPad.h"
 #include "PlayerCharacter.h"
-#include "GameFramework/CharacterMovementComponent"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -15,10 +15,10 @@ AJumpPad::AJumpPad()
 
 
 	//initialise the mesh
-	JumpPadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Jump Pad Mesh"))
+	JumpPadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Jump Pad Mesh"));
 
-		JumpPadTriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Jump Pad Trigger Volume"))
-		JumpPadTriggerVolume->SetupAttachment(JumpPadMesh)
+	JumpPadTriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Jump Pad Trigger Volume"));
+	JumpPadTriggerVolume->SetupAttachment(JumpPadMesh);
 }
 
 // Called when the game starts or when spawned
@@ -41,26 +41,40 @@ void AJumpPad::Tick(float DeltaTime)
 
 void AJumpPad::JumpPadTriggered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!OtherActor || !OtherComp)
+		return;
 
-	if (APlayerCharacter* ourChar = Cast<APlayerCharacter>(OtherActor))
+	/*if (APlayerCharacter* ourChar = Cast<APlayerCharacter>(OtherActor))
 	{
 		if (Cast<UCapsuleComponent>(OtherComp)) == ourChar->GetCapsuleComponent())
 		{
 			JumpPadMesh->SetMaterial(0, ActiveMaterial);
 			ourChar->GetCharacterMovement()->JumpZVelocity *= 2;
 		}
+	}*/
+	//What about if, instead, we did this?
+	if (OtherComp->IsSimulatingPhysics()) {
+
+		return;
+	}
+	UCharacterMovementComponent* character = Cast<UCharacterMovementComponent>(OtherComp);
+	if (character) {
+		
 	}
 }
 
 void AJumpPad::JumpPadEndTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (APlayerCharacter* ourChar = Cast<APlayerCharacter>(OtherActor))
+	if (!OtherActor || !OtherComp)
+		return;
+
+	/*if (APlayerCharacter* ourChar = Cast<APlayerCharacter>(OtherActor))
 	{
 		if (Cast<UCapsuleComponent>(OtherComp)) == ourChar->GetCapsuleComponent())
 		{
 			JumpPadMesh->SetMaterial(0, InactiveMaterial);
 			ourChar->GetCharacterMovement()->JumpZVelocity /= 2;
 		}
-	}
+	}*/
 }
 

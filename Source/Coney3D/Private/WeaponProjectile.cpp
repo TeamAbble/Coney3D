@@ -78,11 +78,13 @@ void AWeaponProjectile::DealDamage(UPrimitiveComponent* HitComponent, AActor* Ot
 
 void AWeaponProjectile::Explode()
 {
-	FActorSpawnParameters params = FActorSpawnParameters();
-	params.Owner = this;
-	params.Instigator = GetInstigator();
-	FTransform transform = FTransform(GetActorRotation(), GetActorLocation());
-	AActor* projectile = GetWorld()->SpawnActor<AActor>(hitEffect, params);
+	if (hitEffect) {
+		FActorSpawnParameters params = FActorSpawnParameters();
+		params.Owner = this;
+		params.Instigator = GetInstigator();
+		FTransform transform = FTransform(GetActorRotation(), GetActorLocation());
+		AActor* projectile = GetWorld()->SpawnActor<AActor>(hitEffect, params);
+	}
 	Destroy();
 }
 

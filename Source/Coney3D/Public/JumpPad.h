@@ -19,25 +19,27 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	class UBoxComponent* JumpPadTriggerVolume;
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(EditDefaultOnly)
+	UPROPERTY(EditDefaultsOnly)
 		class UStaticMeshComponent* JumpPadMesh;
 
 	UPROPERTY(EditDefaultsOnly)
 		class UMaterialInterface* InactiveMaterial;
 
-	UPROPOERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly)
 		class UMaterialInterface* ActiveMaterial;
 
 	UFUNCTION()
-	void JumpPadTriggered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
-		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void JumpPadTriggered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void JumpPadEndTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex);
+	void JumpPadEndTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 };
