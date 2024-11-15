@@ -108,6 +108,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	if (!Dead) {
+		if (GetActorLocation().Z < -1000) {
+			Die(nullptr);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -304,8 +310,10 @@ void APlayerCharacter::Die(AActor *OtherPlayer)
 	if (GEngine) {
 		AddMovementInput(FVector(0, 0, 0));
 		SetActorHiddenInGame(true);
-		APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);
-		OtherP->GainPoint();
+		if (OtherPlayer) {
+			APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);
+			OtherP->GainPoint();
+		}
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &APlayerCharacter::Respawn, RespawnTime, false);
 		weapon->Hide();
 		

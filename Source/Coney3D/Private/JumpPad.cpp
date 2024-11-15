@@ -66,14 +66,14 @@ void AJumpPad::JumpPadTriggered(UPrimitiveComponent* OverlappedComponent, AActor
 		}
 		return;
 	}
-	UCharacterMovementComponent* character = Cast<UCharacterMovementComponent>(OtherComp);
+	ACharacter* character = Cast<ACharacter>(OtherActor);
 	if (character) {
 		if (setVelocityInsteadOfForce) {
-			character->Velocity = force;
+			character->LaunchCharacter(force, true, true);
 		}
 		else
 		{
-			character->Launch(force);
+			character->LaunchCharacter(force, false, false);
 		}
 	}
 }
