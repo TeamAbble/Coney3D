@@ -2,6 +2,8 @@
 
 
 #include "ShooterGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+
 
 void AShooterGameModeBase::BeginPlay()
 {
@@ -11,6 +13,14 @@ void AShooterGameModeBase::BeginPlay()
 	FString error = "Players not found!";
 	//Create local multiplayer mode
 	ULocalPlayer* LocalPlayer = World->GetGameInstance()->CreateLocalPlayer(1, error, true);
+	APlayerCharacter* playerOne = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (playerOne) {
+		PlayerOne = playerOne;
+	}
+	APlayerCharacter* newCharacter = Cast<APlayerCharacter>(LocalPlayer->GetPlayerController(GetWorld())->GetCharacter());
+	if (newCharacter) {
+		PlayerTwo;
+	}
 	//GetWorld()->GetTimerManager().SetTimer(RoundTimer, this, &AShooterGameModeBase::EndMatch, RoundTimeInSeconds, false);
 }
 
@@ -30,21 +40,36 @@ void AShooterGameModeBase::EndMatch()
 	int CurrentWinnerIndex=-1;
 	int CurrentBestScore=-1;
 	bool bDraw = false;
-	TArray<ULocalPlayer*> LocalPlayers = GetGameInstance()->GetLocalPlayers();
-	for (int i = 0; i < LocalPlayers.Num(); i++) {
-		if (LocalPlayers[i] != nullptr) {
-			APlayerCharacter* Player = Cast<APlayerCharacter>(LocalPlayers[i]->GetPlayerController(GetWorld())->GetCharacter());
-			if (Player && Player->GetScore() > CurrentBestScore) {
-				CurrentBestScore = Player->GetScore();
-				CurrentWinnerIndex = LocalPlayers[i]->GetIndexInGameInstance();
-				bDraw = false;
-			}
-			else if (Player && Player->GetScore() == CurrentBestScore) {
-				bDraw = true;
-			}
-			Player->Dead = true;
-				
-		}
+	//We now get the players at the start of the game, so this block is redundant. It has been re-implemented below.
+
+	//TArray<ULocalPlayer*> LocalPlayers = GetGameInstance()->GetLocalPlayers();
+	//for (int i = 0; i < LocalPlayers.Num(); i++) {
+	//	if (LocalPlayers[i] != nullptr) {
+	//		APlayerCharacter* Player = Cast<APlayerCharacter>(LocalPlayers[i]->GetPlayerController(GetWorld())->GetCharacter());
+	//		if (Player)
+	//		{
+	//			if (Player->GetScore() > CurrentBestScore)
+	//			{
+	//				CurrentBestScore = Player->GetScore();
+	//				CurrentWinnerIndex = LocalPlayers[i]->GetIndexInGameInstance();
+	//				bDraw = false;
+	//			}
+	//			else if (Player && Player->GetScore() == CurrentBestScore) {
+	//				bDraw = true;
+	//			}
+	//			Player->Dead = true;
+	//		}
+	//	}
+	//}
+	int score1 = PlayerOne->GetScore();
+	int score2 = PlayerTwo->GetScore();
+	if (score1 == score2) {
+		bDraw = true;
+	}
+	else {
+		bool p1Wins = score1 > score2;
+		CurrentWinnerIndex = p1Wins ? 0 : 1;
+		CurrentBestScore = p1Wins ? score1 : score2;
 	}
 	if (!bDraw) {
 		WinnerText = FString("Player ") + FString::FromInt(CurrentWinnerIndex + 1) + FString(" wins with ") + FString::FromInt(CurrentBestScore) + FString(" points");
@@ -52,7 +77,8 @@ void AShooterGameModeBase::EndMatch()
 	else {
 		WinnerText = FString("Draw");
 	}
-
-
 }
+
+
+
 

@@ -18,6 +18,8 @@ AJumpPad::AJumpPad()
 	//initialise the mesh
 	JumpPadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Jump Pad Mesh"));
 
+	jumpPadDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Jump Direction"));
+
 	JumpPadTriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Jump Pad Trigger Volume"));
 	JumpPadTriggerVolume->SetupAttachment(JumpPadMesh);
 }
