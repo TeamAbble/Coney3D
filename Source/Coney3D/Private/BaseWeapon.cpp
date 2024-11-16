@@ -2,7 +2,6 @@
 
 #include "BaseWeapon.h"
 #include "Kismet/GameplayStatics.h"
-#include "Net/UnrealNetwork.h"
 // Sets default values
 ABaseWeapon::ABaseWeapon()
 {
@@ -66,7 +65,7 @@ void ABaseWeapon::TryFire()
 		accumulatedSpeadCurrent += accumulatedSpeadPerShot;
 		CreateProjectile(muzzlePoint->GetComponentLocation(), hit.bBlockingHit ? hit.ImpactPoint : traceEnd);
 	}
-
+	connectedPlayer->FireEvent();
 }
 
 

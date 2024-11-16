@@ -30,31 +30,33 @@ void APlayerCharacter::BeginPlay()
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Could not get CharacterMovement component!");
 		}
 	}
-
-	if (weaponBlueprint) {
+	if (weaponBlueprints.Num() > 0) {
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
-		if (weaponBlueprints.Num() > 0) {
-			for (size_t i = 0; i < weaponBlueprints.Num(); i++)
-			{
-				if (!weaponBlueprints[i])
-					continue;
+		FName weaponSocketName = TEXT("WeaponBoneSocket");
+		for (size_t i = 0; i < weaponBlueprints.Num(); i++)
+		{
+			if (!weaponBlueprints[i])
+				continue;
 
-				ABaseWeapon* _weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprints[i], spawnParams);
-				_weapon->AttachToComponent(weaponPointRef, FAttachmentTransformRules::KeepRelativeTransform);
-				_weapon->SetActorRelativeTransform(FTransform());
-
-				_weapon->connectedPlayer = this;
-				_weapon->Hide();
-				weapons.Add(_weapon);
+			ABaseWeapon* _weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprints[i], spawnParams);
+			if (_weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, weaponSocketName)) {
+				if (GEngine) {
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Set socket for weapon!");
+				}
 			}
+			_weapon->SetActorRelativeLocation(FVector());
+
+			_weapon->connectedPlayer = this;
+			_weapon->Hide();
+			weapons.Add(_weapon);
+
+
 		}
-		if (weapons[0]) {
-			weapon = weapons[0];
-			weapon->Show();
-		}
+		CycleWeapons(FInputActionValue(FInputActionValue::Axis1D(0)));
 	}
+		
 }
 /// <summary>
 /// <para>Deals damage to this player subtracting from Health</para>
@@ -191,6 +193,13 @@ void APlayerCharacter::CycleWeapons(const FInputActionValue& value)
 			weapons[i]->Hide();
 		}
 	}
+
+	if (weapon) {
+		if(weapon->characterIdleAnim)
+			idleAnim = weapon->characterIdleAnim;
+	}
+
+	UpdateAnimations();
 }
 void APlayerCharacter::SetSprint(const FInputActionValue& value) {
 

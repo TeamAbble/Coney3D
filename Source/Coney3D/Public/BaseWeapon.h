@@ -9,6 +9,7 @@
 #include "EFireType.h"
 #include "PlayerCharacter.h"
 #include "WeaponProjectile.h"
+#include "Animation/AnimSequence.h"
 #include "BaseWeapon.generated.h"
 
 UCLASS()
@@ -114,4 +115,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Aiming") float aimSpeed = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Aiming") float aimFOV = 60;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* idleAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* fireAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* reloadAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* characterIdleAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* characterFireAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* characterReloadAnim;
+
+
+
 };

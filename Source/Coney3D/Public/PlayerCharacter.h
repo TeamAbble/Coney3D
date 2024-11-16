@@ -8,6 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Animation/AnimSequence.h"
+
 #include "PlayerCharacter.generated.h"
 
 
@@ -131,5 +133,20 @@ public:
 	float aimLerpProgress;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float startFOV;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation") UAnimSequence* idleAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation") UAnimMontage* equipAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation") UAnimMontage* fireAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation") UAnimMontage* reloadAnim;
+
+
+	UFUNCTION(BlueprintImplementableEvent) void UpdateAnimations();
+	UFUNCTION(BlueprintImplementableEvent) void ReloadEvent();
+	UFUNCTION(BlueprintImplementableEvent) void FireEvent();
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) UMeshComponent* thirdPersonMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) UMeshComponent* firstPersonMesh;
+	
 };
 
