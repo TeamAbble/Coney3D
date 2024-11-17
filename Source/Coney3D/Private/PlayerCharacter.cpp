@@ -206,8 +206,14 @@ void APlayerCharacter::CycleWeapons(const FInputActionValue& value)
 	}
 
 	if (weapon) {
-		if(weapon->characterIdleAnim)
+		if (weapon->characterIdleAnim)
 			idleAnim = weapon->characterIdleAnim;
+		if (weapon->characterEquipAnim)
+			equipAnim = weapon->characterEquipAnim;
+		if (weapon->characterFireAnim)
+			fireAnim = weapon->characterFireAnim;
+		if (weapon->characterReloadAnim)
+			reloadAnim = weapon->characterReloadAnim;
 	}
 
 	UpdateAnimations();
@@ -425,6 +431,11 @@ void APlayerCharacter::Vault()
 	}
 
 
+}
+
+ABaseWeapon* APlayerCharacter::GetCurrentWeapon() const
+{
+	return weapon;
 }
 
 float APlayerCharacter::GetMaxHealth() const

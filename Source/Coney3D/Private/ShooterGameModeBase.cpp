@@ -19,7 +19,7 @@ void AShooterGameModeBase::BeginPlay()
 	}
 	APlayerCharacter* newCharacter = Cast<APlayerCharacter>(LocalPlayer->GetPlayerController(GetWorld())->GetCharacter());
 	if (newCharacter) {
-		PlayerTwo;
+		PlayerTwo = newCharacter;
 	}
 	//GetWorld()->GetTimerManager().SetTimer(RoundTimer, this, &AShooterGameModeBase::EndMatch, RoundTimeInSeconds, false);
 }

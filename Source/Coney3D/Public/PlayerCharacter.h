@@ -113,6 +113,7 @@ public:
 	UFUNCTION()
 	void Vault();
 	bool Dead = false;
+	UFUNCTION(BlueprintCallable) ABaseWeapon* GetCurrentWeapon() const;
 	ABaseWeapon* weapon;
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentHealth() const;

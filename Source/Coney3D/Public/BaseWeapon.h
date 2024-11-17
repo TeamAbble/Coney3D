@@ -117,13 +117,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Aiming") float aimFOV = 60;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* idleAnim;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* fireAnim;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* reloadAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* fireAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* reloadAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* equipAnim;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* characterIdleAnim;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* characterFireAnim;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimSequence* characterReloadAnim;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* characterFireAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* characterReloadAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* characterEquipAnim;
 
 
 };
