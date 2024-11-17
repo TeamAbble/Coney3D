@@ -164,6 +164,17 @@ void APlayerCharacter::SwitchView(const FInputActionValue& value)
 		firstPersonCamera->Deactivate();
 		thirdPersonCamera->Activate();
 	}
+
+	if (thirdPersonMesh && firstPersonMesh) {
+		thirdPersonMesh->SetOwnerNoSee(firstPerson);
+		thirdPersonMesh->MarkRenderStateDirty();
+	}
+	else {
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Either Third or First Person mesh is null!");
+		}
+	}
+
 	playerCam = firstPerson ? firstPersonCamera : thirdPersonCamera;
 }
 void APlayerCharacter::SetFire(const FInputActionValue& value) {
