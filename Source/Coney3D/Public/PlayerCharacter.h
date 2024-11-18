@@ -67,6 +67,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* WeaponCycleAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* AimAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* ViewSwitchAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")UInputAction* ReloadAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health and Damage") FVector SpawnLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed") float DashSpeed;

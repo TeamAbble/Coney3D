@@ -140,6 +140,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APlayerCharacter::TryAim);
 
 		EnhancedInputComponent->BindAction(ViewSwitchAction, ETriggerEvent::Triggered, this, &APlayerCharacter::SwitchView);
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &APlayerCharacter::ReloadEvent);
 	}
 
 }
