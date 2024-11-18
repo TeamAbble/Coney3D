@@ -84,6 +84,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpeadCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float accumulatedSpreadDecay = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float hipFireSpreadAngle = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float crosshairSpreadCoefficient = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float maxRange = 10000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Accuracy") float minRange = 200.f;
 
