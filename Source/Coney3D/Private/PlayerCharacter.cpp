@@ -41,7 +41,8 @@ void APlayerCharacter::BeginPlay()
 				continue;
 
 			ABaseWeapon* _weapon = GetWorld()->SpawnActor<ABaseWeapon>(weaponBlueprints[i], spawnParams);
-			if (_weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, weaponSocketName)) {
+
+			if (firstPersonMesh && _weapon->AttachToComponent(firstPersonMesh, FAttachmentTransformRules::KeepRelativeTransform, weaponSocketName)) {
 				if (GEngine) {
 					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Set socket for weapon!");
 				}
@@ -334,7 +335,7 @@ bool APlayerCharacter::GetFireInput() const
 void APlayerCharacter::Die(AActor *OtherPlayer)
 {
 	if (GEngine) {
-		AddMovementInput(FVector(0, 0, 0));
+		ConsumeMovementInputVector();
 		SetActorHiddenInGame(true);
 		if (OtherPlayer) {
 			APlayerCharacter* OtherP = Cast<APlayerCharacter>(OtherPlayer);

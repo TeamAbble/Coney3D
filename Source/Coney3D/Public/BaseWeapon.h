@@ -126,5 +126,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* characterReloadAnim;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon - Animation") UAnimMontage* characterEquipAnim;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon - Animation") USkeletalMeshComponent* weaponMesh;
+
 
 };
